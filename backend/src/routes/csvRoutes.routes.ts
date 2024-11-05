@@ -1,14 +1,13 @@
 import { Router } from "express";
 import { uploadConfig } from "../config/multer.config";
+import {
+  getProcessingStatus,
+  uploadCsv,
+} from "../controllers/csvController.controller";
 
-const csvRoutes = Router();
+const router = Router();
 
-csvRoutes.post("/upload", uploadConfig.single("file"), (req, res) => {
-  res.json({ message: "File received" });
-});
+router.post("/upload", uploadConfig.single("file"), uploadCsv);
+router.get("/status/:processId", getProcessingStatus);
 
-csvRoutes.get("/status/:id", (req, res) => {
-  res.json({ status: "Processing..." });
-});
-
-export { csvRoutes };
+export { router as csvRoutes };
