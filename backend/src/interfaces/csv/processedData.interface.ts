@@ -1,4 +1,4 @@
-import { CsvData } from "./CsvData";
+import { CsvData } from "./csvData.interface";
 
 export interface ProcessedData extends CsvData {
   cpfCnpjValido: boolean;

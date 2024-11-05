@@ -1,6 +1,6 @@
 import multer from "multer";
 import { Request } from "express";
-import { env } from "./env";
+import { env } from "./env.config";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
