@@ -7,6 +7,7 @@ import {
   validateContract,
   validateInstallment,
 } from "./csv.validation";
+import { FileProcessingError } from "../middlewares/errorHandler";
 
 const processings = new Map<
   string,
@@ -18,30 +19,43 @@ const processings = new Map<
 >();
 
 const processRecord = async (record: any): Promise<ProcessedData> => {
-  const data: CsvData = {
-    ...record,
-    qtPrestacoes: Number(record.qtPrestacoes),
-    vlTotal: Number(record.vlTotal),
-    nrPresta: Number(record.nrPresta),
-    vlPresta: Number(record.vlPresta),
-    vlMora: Number(record.vlMora),
-    vlMulta: Number(record.vlMulta),
-    vlOutAcr: Number(record.vlOutAcr),
-    vlIof: Number(record.vlIof),
-    vlDescon: Number(record.vlDescon),
-    vlAtual: Number(record.vlAtual),
-  };
+  try {
+    const data: CsvData = {
+      ...record,
+      qtPrestacoes: Number(record.qtPrestacoes),
+      vlTotal: Number(record.vlTotal),
+      nrPresta: Number(record.nrPresta),
+      vlPresta: Number(record.vlPresta),
+      vlMora: Number(record.vlMora),
+      vlMulta: Number(record.vlMulta),
+      vlOutAcr: Number(record.vlOutAcr),
+      vlIof: Number(record.vlIof),
+      vlDescon: Number(record.vlDescon),
+      vlAtual: Number(record.vlAtual),
+    };
 
-  return {
-    ...data,
-    cpfCnpjValido: await validateDocument(data.nrCpfCnpj),
-    contratoValido: await validateContract(data),
-    prestacaoValida: await validateInstallment(
+    const documentValid = await validateDocument(data.nrCpfCnpj);
+    const contractValid = await validateContract(data);
+    const installmentValid = await validateInstallment(
       data.vlTotal,
-      data.nrPresta,
+      data.vlPresta,
       data.qtPrestacoes
-    ),
-  };
+    );
+
+    return {
+      ...data,
+      cpfCnpjValido: documentValid,
+      contratoValido: contractValid,
+      prestacaoValida: installmentValid,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new FileProcessingError(
+        `Error processing record: ${error.message}`
+      );
+    }
+    throw new FileProcessingError("Unknown error processing record");
+  }
 };
 
 const processCsv = async (filePath: string, fileId: string): Promise<void> => {
@@ -49,15 +63,24 @@ const processCsv = async (filePath: string, fileId: string): Promise<void> => {
     processings.set(fileId, { status: "processing" });
 
     const parser = new Parser({ columns: true, skip_empty_lines: true });
-
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(parser);
 
     const results: ProcessedData[] = [];
 
+    let lineNumber = 0;
     for await (const record of parser) {
-      const processedRecord = await processRecord(record);
-      results.push(processedRecord);
+      lineNumber++;
+      try {
+        const processedRecord = await processRecord(record);
+        results.push(processedRecord);
+      } catch (error) {
+        throw new FileProcessingError(
+          `Error on line ${lineNumber}: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        );
+      }
     }
 
     processings.set(fileId, { status: "completed", result: results });
@@ -66,13 +89,16 @@ const processCsv = async (filePath: string, fileId: string): Promise<void> => {
   } catch (error) {
     processings.set(fileId, {
       status: "failed",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Unknown error processing file",
     });
 
     try {
       await fs.promises.unlink(filePath);
-    } catch (error) {
-      console.error("Error deleting file:", error);
+    } catch (unlinkError) {
+      console.error("Error deleting file:", unlinkError);
     }
   }
 };
@@ -80,7 +106,7 @@ const processCsv = async (filePath: string, fileId: string): Promise<void> => {
 const getProcessingStatus = (fileId: string) => {
   return (
     processings.get(fileId) || {
-      status: "Failed",
+      status: "failed",
       error: "Processing not found",
     }
   );
