@@ -6,8 +6,8 @@ import { download } from "../controllers/download.controller";
 
 const router = Router();
 
-router.post("/csv/upload", uploadConfig.single("file"), upload);
-router.get("/csv/status/:processId", getStatus);
-router.get("/csv/download/:processId", download);
+router.post("/upload", uploadConfig.single("file"), upload);
+router.get("/status/:processId", getStatus);
+router.get("/download/:processId", download);
 
 export { router as csvRoutes };
