@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 
 if (!dotenv.config().parsed) {
-  throw new Error("Arquivo .env não encontrado");
+  throw new Error("Environment file (.env) not found");
 }
 
 const requiredEnvs = [
@@ -17,7 +17,7 @@ const requiredEnvs = [
 
 for (const env of requiredEnvs) {
   if (!process.env[env]) {
-    throw new Error(`Variável de ambiente ${env} não definida`);
+    throw new Error(`Environment variable ${env} not defined`);
   }
 }
 
