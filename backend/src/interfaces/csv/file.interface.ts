@@ -1,4 +1,4 @@
-export interface CsvData {
+export interface FileData {
   nrInst: string;
   nrAgencia: string;
   cdClient: string;
