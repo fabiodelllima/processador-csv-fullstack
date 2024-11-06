@@ -12,6 +12,9 @@ const storage = multer.diskStorage({
     }
   },
   filename: (req, file, cb) => {
+    const timestamp = Date.now();
+    const randomString = Math.random().toString(36).substring(2, 15);
+    cb(null, `${timestamp}-${randomString}-${file.originalname}`);
   },
 });
 
