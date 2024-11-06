@@ -1,6 +1,7 @@
 import multer from "multer";
 import { Request } from "express";
 import { env } from "./env.config";
+import { ValidationError } from "../errors/ValidationError";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -11,8 +12,6 @@ const storage = multer.diskStorage({
     }
   },
   filename: (req, file, cb) => {
-    const fileId = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `${fileId}-${file.originalname}`);
   },
 });
 
@@ -22,14 +21,14 @@ const fileFilter = (
   cb: multer.FileFilterCallback
 ) => {
   if (
-    env.upload.allowedMimetypes.includes(
+    !env.upload.allowedMimetypes.includes(
       file.mimetype as "text/csv" | "application/vnd.ms-excel"
     )
   ) {
-    cb(null, true);
-  } else {
-    cb(new Error("Invalid file type. Only CSV files are allowed."));
+    cb(new ValidationError("Invalid file type. Only CSV files are allowed."));
+    return;
   }
+  cb(null, true);
 };
 
 export const uploadConfig = multer({
