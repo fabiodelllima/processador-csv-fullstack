@@ -103,7 +103,7 @@ const processCsv = async (filePath: string, fileId: string): Promise<void> => {
   }
 };
 
-const getProcessingStatus = (fileId: string) => {
+const getCsvProcessingStatus = (fileId: string) => {
   return (
     processings.get(fileId) || {
       status: "failed",
@@ -112,4 +112,4 @@ const getProcessingStatus = (fileId: string) => {
   );
 };
 
-export { processCsv, getProcessingStatus };
+export { processCsv, getCsvProcessingStatus };
