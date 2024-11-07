@@ -133,24 +133,41 @@ export const processCsv = async (
       columns: true,
       skip_empty_lines: true,
       from_line: 1,
+      trim: true,
     });
 
     const fileStream = fs.createReadStream(filePath);
     const processedData: RecordData[] = [];
     const allErrors: ErrorData[] = [];
+
     let lineNumber = 0;
 
-    for await (const record of parser) {
-      lineNumber++;
-      const [data, errors] = await processRecord(record, lineNumber);
+    await new Promise<void>((resolve, reject) => {
+      const fileStream = fs.createReadStream(filePath);
 
-      if (data) {
-        processedData.push(data);
-      }
-      allErrors.push(...errors);
-    }
+      parser.on("readable", async () => {
+        let record;
+        while ((record = parser.read()) !== null) {
+          lineNumber++;
+          const [data, errors] = await processRecord(record, lineNumber);
 
-    fileStream.pipe(parser);
+          if (data) {
+            processedData.push(data);
+          }
+          allErrors.push(...errors);
+        }
+      });
+
+      parser.on("error", (error) => {
+        reject(error);
+      });
+
+      parser.on("end", () => {
+        resolve();
+      });
+
+      fileStream.pipe(parser);
+    });
 
     const endTime = new Date();
     const processingTime = `${
