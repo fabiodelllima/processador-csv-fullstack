@@ -1,4 +1,3 @@
-import * as fs from "fs";
 import { ValidationError } from "../../errors/ValidationError";
 
 const REQUIRED_COLUMNS = [
@@ -29,11 +28,15 @@ const REQUIRED_COLUMNS = [
   "vlAtual",
   "idSituac",
   "idSitVen",
-];
+] as const;
 
 const validateFileStructure = async (headers: string[]): Promise<void> => {
+  const cleanHeaders = headers.map((header) =>
+    header.trim().replace(/[\r\n"]/g, "")
+  );
+
   const missingColumns = REQUIRED_COLUMNS.filter(
-    (column) => !headers.includes(column)
+    (column) => !cleanHeaders.includes(column)
   );
 
   if (missingColumns.length > 0) {
@@ -58,60 +61,6 @@ const validateFileContent = (file: Express.Multer.File): void => {
   }
 };
 
-export const validateFile = async (
-  fileStream: fs.ReadStream,
-  headers: string[]
-): Promise<void> => {
-  if (!fileStream) {
-    throw new Error("File stream is null");
-  }
-
-  const fileBuffer = await new Promise<Buffer>((resolve, reject) => {
-    const chunks: Buffer[] = [];
-    fileStream.on("data", (chunk: string | Buffer) => {
-      if (chunk === null) {
-        reject(new Error("File stream produced null chunk"));
-        return;
-      }
-
-      const buffer = Buffer.isBuffer(chunk)
-        ? chunk
-        : Buffer.from(chunk, "utf8");
-      chunks.push(buffer);
-    });
-
-    fileStream.on("error", (error) => {
-      reject(error);
-    });
-
-    fileStream.on("end", () => {
-      const fileBuffer = Buffer.concat(chunks);
-      const file = {
-        buffer: fileBuffer,
-        mimetype: "text/csv",
-        size: fileBuffer.length,
-      };
-
-      try {
-        validateFileContent(file as Express.Multer.File);
-        validateFileStructure(headers);
-      } catch (error) {
-        reject(error);
-      } finally {
-        resolve(fileBuffer);
-      }
-    });
-  });
-
-  if (!fileBuffer) {
-    throw new Error("File buffer is null");
-  }
-};
-
-export const generateProcessId = (): string => {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-};
-
 export const validateFileUpload = async (
   file: Express.Multer.File
 ): Promise<string> => {
@@ -120,6 +69,9 @@ export const validateFileUpload = async (
   }
 
   validateFileContent(file);
-
   return generateProcessId();
+};
+
+export const generateProcessId = (): string => {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 };
