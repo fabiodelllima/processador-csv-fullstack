@@ -4,6 +4,7 @@ import { ErrorData, FileData, RecordData, ResultData } from "../interfaces";
 import { validateDocument } from "./validations/document.validation";
 import { validateContract } from "./validations/contract.validation";
 import { validateInstallment } from "./validations/installment.validation";
+import { parseDecimalNumber, parseWholeNumber } from "../utils/format.util";
 
 const processings = new Map<string, ResultData>();
 
@@ -15,17 +16,33 @@ const processRecord = async (
 
   try {
     const data: FileData = {
-      ...record,
-      qtPrestacoes: Number(record.qtPrestacoes),
-      vlTotal: Number(record.vlTotal),
-      nrPresta: Number(record.nrPresta),
-      vlPresta: Number(record.vlPresta),
-      vlMora: Number(record.vlMora),
-      vlMulta: Number(record.vlMulta),
-      vlOutAcr: Number(record.vlOutAcr),
-      vlIof: Number(record.vlIof),
-      vlDescon: Number(record.vlDescon),
-      vlAtual: Number(record.vlAtual),
+      nrInst: String(record.nrInst),
+      nrAgencia: String(record.nrAgencia),
+      cdClient: String(record.cdClient),
+      nmClient: String(record.nmClient),
+      nrCpfCnpj: String(record.nrCpfCnpj),
+      nrContrato: String(record.nrContrato),
+      dtContrato: String(record.dtContrato),
+      cdProduto: String(record.cdProduto),
+      dsProduto: String(record.dsProduto),
+      cdCarteira: String(record.cdCarteira),
+      dsCarteira: String(record.dsCarteira),
+      nrProposta: String(record.nrProposta),
+      tpPresta: String(record.tpPresta),
+      nrSeqPre: String(record.nrSeqPre),
+      dtVctPre: String(record.dtVctPre),
+      idSituac: String(record.idSituac),
+      idSitVen: String(record.idSitVen),
+      qtPrestacoes: parseWholeNumber(record.qtPrestacoes),
+      nrPresta: parseWholeNumber(record.nrPresta),
+      vlTotal: parseDecimalNumber(record.vlTotal),
+      vlPresta: parseDecimalNumber(record.vlPresta),
+      vlMora: parseDecimalNumber(record.vlMora),
+      vlMulta: parseDecimalNumber(record.vlMulta),
+      vlOutAcr: parseDecimalNumber(record.vlOutAcr),
+      vlIof: parseDecimalNumber(record.vlIof),
+      vlDescon: parseDecimalNumber(record.vlDescon),
+      vlAtual: parseDecimalNumber(record.vlAtual),
     };
 
     let cpfCnpjValido = false;
