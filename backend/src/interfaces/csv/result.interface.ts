@@ -1,5 +1,6 @@
 import { ErrorData } from "./error.interface";
 import { RecordData } from "./record.interface";
+import { SuccessData } from "./success.interface";
 
 export type ProcessingStatus = "processing" | "completed" | "failed";
 
@@ -9,6 +10,7 @@ export interface ResultData {
   result?: {
     data: RecordData[];
     errors: ErrorData[];
+    successes: SuccessData[];
     summary: {
       totalRecords: number;
       validRecords: number;
