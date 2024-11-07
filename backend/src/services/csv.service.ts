@@ -33,7 +33,7 @@ const processRecord = async (
     let prestacaoValida = false;
 
     try {
-      cpfCnpjValido = validateDocument(data.nrCpfCnpj);
+      cpfCnpjValido = await validateDocument(data.nrCpfCnpj);
     } catch (error) {
       errors.push({
         line: lineNumber,
@@ -44,7 +44,7 @@ const processRecord = async (
     }
 
     try {
-      contratoValido = validateContract(data);
+      contratoValido = await validateContract(data);
     } catch (error) {
       errors.push({
         line: lineNumber,
@@ -55,7 +55,7 @@ const processRecord = async (
     }
 
     try {
-      prestacaoValida = validateInstallment(
+      prestacaoValida = await validateInstallment(
         data.vlTotal,
         data.vlPresta,
         data.qtPrestacoes
@@ -112,14 +112,17 @@ export const processCsv = async (
       },
     });
 
-    const parser = new Parser({ columns: true, skip_empty_lines: true });
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(parser);
+    const parser = new Parser({
+      columns: true,
+      skip_empty_lines: true,
+      from_line: 1,
+    });
 
+    const fileStream = fs.createReadStream(filePath);
     const processedData: RecordData[] = [];
     const allErrors: ErrorData[] = [];
-
     let lineNumber = 0;
+
     for await (const record of parser) {
       lineNumber++;
       const [data, errors] = await processRecord(record, lineNumber);
@@ -129,6 +132,8 @@ export const processCsv = async (
       }
       allErrors.push(...errors);
     }
+
+    fileStream.pipe(parser);
 
     const endTime = new Date();
     const processingTime = `${
