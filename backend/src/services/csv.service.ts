@@ -171,12 +171,16 @@ export const processCsv = async (
         let record;
         while ((record = parser.read()) !== null) {
           lineNumber++;
-          const [data, errors] = await processRecord(record, lineNumber);
+          const [data, errors, successes] = await processRecord(
+            record,
+            lineNumber
+          );
 
           if (data) {
             processedData.push(data);
           }
           allErrors.push(...errors);
+          allSuccesses.push(...successes);
         }
       });
 
