@@ -19,19 +19,5 @@ export const validateInstallment = (
     throw new ValidationError("Installment value must be greater than zero");
   }
 
-  const expectedInstallment = total / count;
-  const tolerance = 0.01;
-
-  if (
-    Math.abs(expectedInstallment - installment) / expectedInstallment >
-    tolerance
-  ) {
-    throw new ValidationError(
-      `Invalid installment value. Expected around ${expectedInstallment.toFixed(
-        2
-      )}, got ${installment.toFixed(2)}`
-    );
-  }
-
   return true;
 };
