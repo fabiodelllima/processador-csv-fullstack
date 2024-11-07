@@ -10,7 +10,7 @@ export const validateContract = (data: FileData): boolean => {
     throw new ValidationError("Contract date is required");
   }
 
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  const dateRegex = /^\d{8}$/;
   if (!dateRegex.test(data.dtContrato)) {
     throw new ValidationError("Invalid contract date format. Use YYYY-MM-DD");
   }
