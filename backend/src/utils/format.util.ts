@@ -52,3 +52,8 @@ const countInvalidRecords = (records: RecordData[]): number =>
     (record) =>
       !record.cpfCnpjValido || !record.contratoValido || !record.prestacaoValida
   ).length;
+// "1.234,56" => 1234.56
+export const parseDecimalNumber = (value: string | number): number => {
+  if (typeof value === "number") return value;
+  return Number(String(value).replace(/[^\d.-]/g, ""));
+};
