@@ -11,7 +11,7 @@ export const StatusDots = ({
 }: StatusDotsProps) => (
   <div
     className="flex justify-center gap-1"
-    title="Document Status | Contract Status | Installment Status"
+    title="Documento | Contrato | Prestações"
   >
     <span
       className={`inline-block w-2 h-2 rounded-full ${

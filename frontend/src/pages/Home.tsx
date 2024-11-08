@@ -15,8 +15,7 @@ export const Home = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
       <div className="max-w-4xl mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-6">CSV Processor</h1>
-
+        <h1 className="text-2xl font-bold mb-6">Processador CSV</h1>
         <div className="mb-8 p-6 border border-gray-700 rounded-lg bg-gray-800 shadow-sm">
           <input
             type="file"
@@ -25,16 +24,14 @@ export const Home = () => {
             className="mb-4 block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 
                      file:text-sm file:font-semibold file:bg-gray-700 file:text-gray-100 hover:file:bg-gray-600"
           />
-
           <button
             onClick={processFile}
             disabled={!file || isUploading}
             className="bg-blue-600 text-gray-100 px-4 py-2 rounded-md hover:bg-blue-700 
                      disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isUploading ? "Uploading..." : "Upload File"}
+            {isUploading ? "Enviando..." : "Enviar arquivo"}
           </button>
-
           {error && (
             <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded-md border border-red-700">
               {error}
@@ -44,7 +41,9 @@ export const Home = () => {
 
         {status && (
           <div className="mb-8 p-6 border border-gray-700 rounded-lg bg-gray-800 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Processing Status</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Status do Processamento
+            </h2>
             <div className="flex items-center gap-2">
               <div
                 className={`h-3 w-3 rounded-full ${
@@ -55,36 +54,36 @@ export const Home = () => {
                     : "bg-red-500"
                 }`}
               />
-              <span className="capitalize">{status}</span>
+              <span className="capitalize pb-0.5">{status}</span>
             </div>
           </div>
         )}
 
         {result?.data && (
           <div className="p-6 border border-gray-700 rounded-lg bg-gray-800 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Results</h2>
+            <h2 className="text-xl font-semibold mb-4">Resultados</h2>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="p-4 bg-gray-700 rounded-md">
-                <p className="text-sm text-gray-400">Total Records</p>
+                <p className="text-sm text-gray-400">Total de Registros</p>
                 <p className="text-2xl font-semibold">
                   {result.data.summary.totalRecords}
                 </p>
               </div>
               <div className="p-4 bg-gray-700 rounded-md">
-                <p className="text-sm text-gray-400">Valid Records</p>
+                <p className="text-sm text-gray-400">Registros Válidos</p>
                 <p className="text-2xl font-semibold">
                   {result.data.summary.validRecords}
                 </p>
               </div>
               <div className="p-4 bg-gray-700 rounded-md">
-                <p className="text-sm text-gray-400">Invalid Records</p>
+                <p className="text-sm text-gray-400">Registros Inválidos</p>
                 <p className="text-2xl font-semibold">
                   {result.data.summary.invalidRecords}
                 </p>
               </div>
               <div className="p-4 bg-gray-700 rounded-md">
-                <p className="text-sm text-gray-400">Total Value</p>
+                <p className="text-sm text-gray-400">Valor Total</p>
                 <p className="text-2xl font-semibold">
                   {new Intl.NumberFormat("pt-BR", {
                     style: "currency",
@@ -98,10 +97,10 @@ export const Home = () => {
               <table className="w-full text-sm">
                 <thead className="bg-gray-700">
                   <tr>
-                    <th className="p-3 text-left">Client</th>
+                    <th className="p-3 text-left">Cliente</th>
                     <th className="p-3 text-left">CPF/CNPJ</th>
-                    <th className="p-3 text-left">Contract</th>
-                    <th className="p-3 text-right">Total Value</th>
+                    <th className="p-3 text-left">Contrato</th>
+                    <th className="p-3 text-right">Valor Total</th>
                     <th className="p-3 text-center">Status</th>
                   </tr>
                 </thead>
