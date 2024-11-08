@@ -1,4 +1,5 @@
 import { StatusDots } from "../components/StatusDots";
+import { Loader } from "../components/Loader";
 import { useCsvProcessor } from "../hooks/useCsvProcessor";
 
 const translateStatus = (status: string) => {
@@ -8,7 +9,6 @@ const translateStatus = (status: string) => {
     failed: "Falha",
     error: "Erro",
   };
-
   return translations[status] || status;
 };
 
@@ -25,6 +25,9 @@ export const Home = () => {
 
   const isButtonDisabled =
     !file || isUploading || (file && file.type !== "text/csv");
+  const showLoader =
+    status === "processing" || (status === "success" && !result);
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
       <div className="max-w-7xl mx-auto p-4 sm:p-6">
@@ -99,7 +102,13 @@ export const Home = () => {
           </div>
         )}
 
-        {result?.data && (
+        {showLoader && (
+          <div className="mb-8">
+            <Loader />
+          </div>
+        )}
+
+        {result?.data && !showLoader && (
           <div className="p-4 sm:p-6 border border-gray-700 rounded-lg bg-gray-800 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Resultados</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
