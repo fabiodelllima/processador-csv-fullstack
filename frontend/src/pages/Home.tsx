@@ -1,6 +1,17 @@
 import { StatusDots } from "../components/StatusDots";
 import { useCsvProcessor } from "../hooks/useCsvProcessor";
 
+const translateStatus = (status: string) => {
+  const translations: Record<string, string> = {
+    success: "Sucesso",
+    processing: "Processando",
+    failed: "Falha",
+    error: "Erro",
+  };
+
+  return translations[status] || status;
+};
+
 export const Home = () => {
   const {
     file,
@@ -14,33 +25,56 @@ export const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
-      <div className="max-w-4xl mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-6">Processador CSV</h1>
-        <div className="mb-8 p-6 border border-gray-700 rounded-lg bg-gray-800 shadow-sm">
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleFileSelect}
-            className="mb-4 block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 
-                     file:text-sm file:font-semibold file:bg-gray-700 file:text-gray-100 hover:file:bg-gray-600"
-          />
-          <button
-            onClick={processFile}
-            disabled={!file || isUploading}
-            className="bg-blue-600 text-gray-100 px-4 py-2 rounded-md hover:bg-blue-700 
-                     disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isUploading ? "Enviando..." : "Enviar arquivo"}
-          </button>
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
+        <h1 className="text-2xl font-bold mb-6 text-center sm:text-left">
+          Processador CSV
+        </h1>
+        <div className="mb-8 p-4 sm:p-6 border border-gray-700 rounded-lg bg-gray-800/50 shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="relative group">
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileSelect}
+                  className="sr-only peer"
+                />
+                <span
+                  className="flex items-center justify-center w-full h-12 cursor-pointer rounded-lg 
+                             bg-gray-700/50 text-gray-300 border border-gray-600/50
+                             group-hover:bg-gray-600/50 peer-focus:ring-2 
+                             peer-focus:ring-blue-500/50 transition-all duration-200"
+                >
+                  Procurar arquivo...
+                </span>
+              </label>
+              {file && (
+                <div className="text-sm text-gray-400 px-1 truncate">
+                  Arquivo selecionado: {file.name}
+                </div>
+              )}
+            </div>
+            <button
+              onClick={processFile}
+              disabled={
+                !file || isUploading || (file && file.type !== "text/csv")
+              }
+              className="h-12 bg-blue-600/90 text-gray-100 rounded-lg hover:bg-blue-700/90 
+                       disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            >
+              {isUploading ? "Enviando..." : "Enviar arquivo"}
+            </button>
+          </div>
+
           {error && (
-            <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded-md border border-red-700">
+            <div className="mt-4 p-4 bg-red-900/50 text-red-200 rounded-lg border border-red-700/50">
               {error}
             </div>
           )}
         </div>
 
         {status && (
-          <div className="mb-8 p-6 border border-gray-700 rounded-lg bg-gray-800 shadow-sm">
+          <div className="mb-8 p-4 sm:p-6 border border-gray-700 rounded-lg bg-gray-800 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">
               Status do Processamento
             </h2>
@@ -54,16 +88,17 @@ export const Home = () => {
                     : "bg-red-500"
                 }`}
               />
-              <span className="capitalize pb-0.5">{status}</span>
+              <span className="capitalize pb-0.5">
+                {translateStatus(status)}
+              </span>
             </div>
           </div>
         )}
 
         {result?.data && (
-          <div className="p-6 border border-gray-700 rounded-lg bg-gray-800 shadow-sm">
+          <div className="p-4 sm:p-6 border border-gray-700 rounded-lg bg-gray-800 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Resultados</h2>
-
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               <div className="p-4 bg-gray-700 rounded-md">
                 <p className="text-sm text-gray-400">Total de Registros</p>
                 <p className="text-2xl font-semibold">
@@ -92,25 +127,38 @@ export const Home = () => {
                 </p>
               </div>
             </div>
-
             <div className="overflow-x-auto rounded-lg border border-gray-700">
               <table className="w-full text-sm">
                 <thead className="bg-gray-700">
                   <tr>
-                    <th className="p-3 text-left">Cliente</th>
-                    <th className="p-3 text-left">CPF/CNPJ</th>
-                    <th className="p-3 text-left">Contrato</th>
-                    <th className="p-3 text-right">Valor Total</th>
-                    <th className="p-3 text-center">Status</th>
+                    <th className="p-3 text-left whitespace-nowrap">Cliente</th>
+                    <th className="p-3 text-left whitespace-nowrap">
+                      CPF/CNPJ
+                    </th>
+                    <th className="p-3 text-left whitespace-nowrap">
+                      Contrato
+                    </th>
+                    <th className="p-3 text-right whitespace-nowrap">
+                      Valor Total
+                    </th>
+                    <th className="p-3 text-center whitespace-nowrap">
+                      Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
                   {result.data.data.map((record, index) => (
                     <tr key={index} className="hover:bg-gray-700/50">
-                      <td className="p-3">{record.nmClient}</td>
-                      <td className="p-3">{record.nrCpfCnpj}</td>
-                      <td className="p-3">{record.nrContrato}</td>
-                      <td className="p-3 text-right">
+                      <td className="p-3 whitespace-nowrap">
+                        {record.nmClient}
+                      </td>
+                      <td className="p-3 whitespace-nowrap">
+                        {record.nrCpfCnpj}
+                      </td>
+                      <td className="p-3 whitespace-nowrap">
+                        {record.nrContrato}
+                      </td>
+                      <td className="p-3 text-right whitespace-nowrap">
                         {new Intl.NumberFormat("pt-BR", {
                           style: "currency",
                           currency: "BRL",
