@@ -1,8 +1,6 @@
-### CSV Processor
+### Processador CSV
 
 > Uma aplicação para processamento e validação de arquivos CSV com validações específicas para documentos (CPF/CNPJ), contratos e prestações.
-
-<br>
 
 ## Configurações
 
