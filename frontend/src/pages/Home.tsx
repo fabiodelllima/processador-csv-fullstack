@@ -1,4 +1,5 @@
 import { StatusDots } from "../components/StatusDots";
+import { Loader } from "../components/Loader";
 import { useCsvProcessor } from "../hooks/useCsvProcessor";
 
 const translateStatus = (status: string) => {
@@ -8,7 +9,6 @@ const translateStatus = (status: string) => {
     failed: "Falha",
     error: "Erro",
   };
-
   return translations[status] || status;
 };
 
@@ -22,6 +22,11 @@ export const Home = () => {
     handleFileSelect,
     processFile,
   } = useCsvProcessor();
+
+  const isButtonDisabled =
+    !file || isUploading || (file && file.type !== "text/csv");
+  const showLoader =
+    status === "processing" || (status === "success" && !result);
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -56,11 +61,13 @@ export const Home = () => {
             </div>
             <button
               onClick={processFile}
-              disabled={
-                !file || isUploading || (file && file.type !== "text/csv")
-              }
-              className="h-12 bg-blue-600/90 text-gray-100 rounded-lg hover:bg-blue-700/90 
-                       disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              disabled={isButtonDisabled}
+              className={`h-12 bg-blue-600/90 text-gray-100 rounded-lg transition-all duration-200
+                        ${
+                          isButtonDisabled
+                            ? "opacity-50 cursor-default"
+                            : "hover:bg-blue-700/90 cursor-pointer"
+                        }`}
             >
               {isUploading ? "Enviando..." : "Enviar arquivo"}
             </button>
@@ -95,7 +102,13 @@ export const Home = () => {
           </div>
         )}
 
-        {result?.data && (
+        {showLoader && (
+          <div className="mb-8">
+            <Loader />
+          </div>
+        )}
+
+        {result?.data && !showLoader && (
           <div className="p-4 sm:p-6 border border-gray-700 rounded-lg bg-gray-800 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Resultados</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

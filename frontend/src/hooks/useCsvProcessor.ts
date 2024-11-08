@@ -16,6 +16,9 @@ export const useCsvProcessor = () => {
     if (selectedFile?.type === "text/csv") {
       setFile(selectedFile);
       setError(null);
+      setResult(null);
+      setStatus(null);
+      setProcessId(null);
     } else {
       setError("Please select a valid CSV file");
       setFile(null);
