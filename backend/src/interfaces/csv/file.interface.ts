@@ -1,0 +1,29 @@
+export interface FileData {
+  nrInst: string;
+  nrAgencia: string;
+  cdClient: string;
+  nmClient: string;
+  nrCpfCnpj: string;
+  nrContrato: string;
+  dtContrato: string;
+  qtPrestacoes: number;
+  vlTotal: number;
+  cdProduto: string;
+  dsProduto: string;
+  cdCarteira: string;
+  dsCarteira: string;
+  nrProposta: string;
+  nrPresta: number;
+  tpPresta: string;
+  nrSeqPre: string;
+  dtVctPre: string;
+  vlPresta: number;
+  vlMora: number;
+  vlMulta: number;
+  vlOutAcr: number;
+  vlIof: number;
+  vlDescon: number;
+  vlAtual: number;
+  idSituac: string;
+  idSitVen: string;
+}
