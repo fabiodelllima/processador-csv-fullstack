@@ -1,4 +1,5 @@
 import multer from "multer";
+import path from "path";
 import { Request } from "express";
 import { env } from "./env.config";
 import { ValidationError } from "../errors/ValidationError";
@@ -14,7 +15,8 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
-    cb(null, `${timestamp}-${randomString}-${file.originalname}`);
+    const sanitizedName = path.basename(file.originalname).replace(/[^a-zA-Z0-9._-]/g, "_");
+    cb(null, `${timestamp}-${randomString}-${sanitizedName}`);
   },
 });
 
