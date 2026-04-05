@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import { Parser } from "csv-parse";
 import { ErrorData, FileData, RecordData, ResultData } from "../interfaces";
 import { validateDocument } from "./validations/document.validation";
@@ -6,8 +7,26 @@ import { validateContract } from "./validations/contract.validation";
 import { validateInstallment } from "./validations/installment.validation";
 import { parseDecimalNumber, parseWholeNumber } from "../utils/format.util";
 import { SuccessData } from "../interfaces/csv/success.interface";
+import { env } from "../config/env.config";
 
 const processings = new Map<string, ResultData>();
+
+/**
+ * Resolves the given file path and ensures it resides within the
+ * configured upload directory, preventing path traversal attacks.
+ */
+const safeguardFilePath = (filePath: string): string => {
+  const uploadDir = path.resolve(env.upload.folder);
+  const resolved = path.resolve(filePath);
+
+  if (!resolved.startsWith(uploadDir + path.sep) && resolved !== uploadDir) {
+    throw new Error(
+      `Path traversal blocked: "${filePath}" resolves outside upload directory`
+    );
+  }
+
+  return resolved;
+};
 
 const processRecord = async (
   record: any,
@@ -131,6 +150,7 @@ export const processCsv = async (
   fileId: string
 ): Promise<void> => {
   const startTime = new Date();
+  filePath = safeguardFilePath(filePath);
 
   try {
     processings.set(fileId, {
