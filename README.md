@@ -12,7 +12,7 @@ Desafio técnico fullstack para processamento e validação de grandes volumes d
   - [Frontend](#frontend)
 - [Estrutura do CSV](#estrutura-do-csv)
 - [Stack](#stack)
-- [Execução](#execução)
+- [Uso](#uso)
 
 ---
 
@@ -109,7 +109,7 @@ Os arquivos de entrada contêm registros de contratos financeiros com as seguint
 
 ---
 
-## Execução
+## Uso
 
 ### Backend
 
