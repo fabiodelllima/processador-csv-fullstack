@@ -42,20 +42,20 @@ A arquitetura separa responsabilidades em camadas bem definidas: os controllers 
 
 ```
 backend/src/
-├── controllers/                        # Upload, download, status de processamento
+├── controllers/                      # Upload, download, status de processamento
 ├── services/
-│   ├── csv.service.ts                  # Orquestração do fluxo de processamento
+│   ├── csv.service.ts                # Orquestração do fluxo de processamento
 │   └── validations/
-│       ├── document.validation.ts      # CPF/CNPJ (algoritmo próprio)
-│       ├── contract.validation.ts      # Consistência contratual
-│       ├── installment.validation.ts   # Verificação de prestações
-│       └── file.validation.ts          # Validação de formato do CSV
-├── interfaces/                         # Tipagem TypeScript (records, results, errors)
-├── errors/                             # Hierarquia de erros (AppError, ValidationError, etc.)
-├── middlewares/                        # Error handler global, upload handler (multer)
-├── config/                             # Database, variáveis de ambiente, upload
-├── utils/                              # Formatação monetária (BRL)
-└── routes/                             # Endpoints REST
+│       ├── document.validation.ts    # CPF/CNPJ (algoritmo próprio)
+│       ├── contract.validation.ts    # Consistência contratual
+│       ├── installment.validation.ts # Verificação de prestações
+│       └── file.validation.ts        # Validação de formato do CSV
+├── interfaces/                       # Tipagem TypeScript (records, results, errors)
+├── errors/                           # Hierarquia de erros (AppError, ValidationError, etc.)
+├── middlewares/                      # Error handler global, upload handler (multer)
+├── config/                           # Database, variáveis de ambiente, upload
+├── utils/                            # Formatação monetária (BRL)
+└── routes/                           # Endpoints REST
 ```
 
 A validação de documentos implementa, do zero, o algoritmo de dígitos verificadores da Receita Federal. Para o **CPF**, os multiplicadores [10,9,8…2] geram o primeiro dígito verificador e [11,10,9…2] geram o segundo, com resto de divisão por 11 determinando o dígito esperado. Para o **CNPJ**, a mesma lógica se aplica com multiplicadores [5,4,3,2,9,8,7,6,5,4,3,2] e [6,5,4,3,2,9,8,7,6,5,4,3,2]. Ambos os algoritmos tratam os casos limite definidos pela Receita — sequências repetidas (111.111.111-11), restos iguais a zero e restos iguais a um.
