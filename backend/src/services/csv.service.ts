@@ -12,20 +12,14 @@ import { env } from "../config/env.config";
 const processings = new Map<string, ResultData>();
 
 /**
- * Resolves the given file path and ensures it resides within the
- * configured upload directory, preventing path traversal attacks.
+ * Strips directory components from the given file path and rebuilds it
+ * relative to the configured upload directory. This prevents path
+ * traversal by construction — path.basename is a CodeQL-recognized
+ * sanitizer that eliminates all directory segments.
  */
-const safeguardFilePath = (filePath: string): string => {
-  const uploadDir = path.resolve(env.upload.folder);
-  const resolved = path.resolve(filePath);
-
-  if (!resolved.startsWith(uploadDir + path.sep) && resolved !== uploadDir) {
-    throw new Error(
-      `Path traversal blocked: "${filePath}" resolves outside upload directory`
-    );
-  }
-
-  return resolved;
+const toSafeUploadPath = (filePath: string): string => {
+  const fileName = path.basename(filePath);
+  return path.join(path.resolve(env.upload.folder), fileName);
 };
 
 const processRecord = async (
@@ -150,7 +144,7 @@ export const processCsv = async (
   fileId: string
 ): Promise<void> => {
   const startTime = new Date();
-  filePath = safeguardFilePath(filePath);
+  const safePath = toSafeUploadPath(filePath);
 
   try {
     processings.set(fileId, {
@@ -185,7 +179,7 @@ export const processCsv = async (
     let lineNumber = 0;
 
     await new Promise<void>((resolve, reject) => {
-      const fileStream = fs.createReadStream(filePath);
+      const fileStream = fs.createReadStream(safePath);
 
       parser.on("readable", async () => {
         let record;
@@ -246,7 +240,7 @@ export const processCsv = async (
       },
     });
 
-    await fs.promises.unlink(filePath);
+    await fs.promises.unlink(safePath);
   } catch (error) {
     processings.set(fileId, {
       status: "failed",
@@ -257,7 +251,7 @@ export const processCsv = async (
     });
 
     try {
-      await fs.promises.unlink(filePath);
+      await fs.promises.unlink(safePath);
     } catch (unlinkError) {
       console.error("Error deleting file:", unlinkError);
     }
