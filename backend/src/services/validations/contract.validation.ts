@@ -12,7 +12,7 @@ export const validateContract = (data: FileData): boolean => {
 
   const dateRegex = /^\d{8}$/;
   if (!dateRegex.test(data.dtContrato)) {
-    throw new ValidationError("Invalid contract date format. Use YYYY-MM-DD");
+    throw new ValidationError("Invalid contract date format. Expected 8 digits (YYYYMMDD)");
   }
 
   if (data.vlTotal <= 0) {
