@@ -30,10 +30,10 @@ const toSafeUploadPath = (filePath: string): string => {
   return path.join(path.resolve(env.upload.folder), fileName);
 };
 
-const processRecord = async (
+const processRecord = (
   record: any,
   lineNumber: number,
-): Promise<[RecordData | null, ErrorData[], SuccessData[]]> => {
+): [RecordData | null, ErrorData[], SuccessData[]] => {
   const errors: ErrorData[] = [];
   const successes: SuccessData[] = [];
 
@@ -182,11 +182,11 @@ export const processCsv = async (filePath: string, fileId: string): Promise<void
     await new Promise<void>((resolve, reject) => {
       const fileStream = fs.createReadStream(safePath);
 
-      parser.on("readable", async () => {
+      parser.on("readable", () => {
         let record;
         while ((record = parser.read()) !== null) {
           lineNumber++;
-          const [data, errors, successes] = await processRecord(record, lineNumber);
+          const [data, errors, successes] = processRecord(record, lineNumber);
 
           if (data) {
             processedData.push(data);
