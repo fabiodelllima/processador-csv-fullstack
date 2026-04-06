@@ -107,11 +107,7 @@ const processRecord = async (
     }
 
     try {
-      prestacaoValida = validateInstallment(
-        data.vlTotal,
-        data.vlPresta,
-        data.qtPrestacoes,
-      );
+      prestacaoValida = validateInstallment(data.vlTotal, data.vlPresta, data.qtPrestacoes);
       successes.push({
         line: lineNumber,
         field: "installment",
@@ -147,10 +143,7 @@ const processRecord = async (
   }
 };
 
-export const processCsv = async (
-  filePath: string,
-  fileId: string,
-): Promise<void> => {
+export const processCsv = async (filePath: string, fileId: string): Promise<void> => {
   const startTime = new Date();
   const safePath = toSafeUploadPath(filePath);
 
@@ -193,10 +186,7 @@ export const processCsv = async (
         let record;
         while ((record = parser.read()) !== null) {
           lineNumber++;
-          const [data, errors, successes] = await processRecord(
-            record,
-            lineNumber,
-          );
+          const [data, errors, successes] = await processRecord(record, lineNumber);
 
           if (data) {
             processedData.push(data);
@@ -218,13 +208,10 @@ export const processCsv = async (
     });
 
     const endTime = new Date();
-    const processingTime = `${
-      (endTime.getTime() - startTime.getTime()) / 1000
-    }s`;
+    const processingTime = `${(endTime.getTime() - startTime.getTime()) / 1000}s`;
 
     const validRecords = processedData.filter(
-      (record) =>
-        record.cpfCnpjValido && record.contratoValido && record.prestacaoValida,
+      (record) => record.cpfCnpjValido && record.contratoValido && record.prestacaoValida,
     );
 
     processings.set(fileId, {
@@ -238,10 +225,7 @@ export const processCsv = async (
           validRecords: validRecords.length,
           invalidRecords: processedData.length - validRecords.length,
           processingTime,
-          totalValue: validRecords.reduce(
-            (sum, record) => sum + record.vlTotal,
-            0,
-          ),
+          totalValue: validRecords.reduce((sum, record) => sum + record.vlTotal, 0),
           startTime,
           endTime,
         },
@@ -252,10 +236,7 @@ export const processCsv = async (
   } catch (error) {
     processings.set(fileId, {
       status: "failed",
-      error:
-        error instanceof Error
-          ? error.message
-          : "Unknown error processing file",
+      error: error instanceof Error ? error.message : "Unknown error processing file",
     });
 
     try {
@@ -266,8 +247,6 @@ export const processCsv = async (
   }
 };
 
-export const getCsvProcessingStatus = (
-  fileId: string,
-): ResultData | undefined => {
+export const getCsvProcessingStatus = (fileId: string): ResultData | undefined => {
   return processings.get(fileId);
 };

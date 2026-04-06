@@ -8,38 +8,34 @@ import { HttpResponse, ResultData } from "../interfaces";
 
 type ProcessingResponse = ReturnType<typeof formatProcessingResponse>;
 
-export const getStatus = asyncErrorHandler(
-  async (req: Request, res: Response) => {
-    const { processId } = req.params;
+export const getStatus = asyncErrorHandler(async (req: Request, res: Response) => {
+  const { processId } = req.params;
 
-    if (!processId) {
-      throw new ValidationError("Process ID is required");
-    }
+  if (!processId) {
+    throw new ValidationError("Process ID is required");
+  }
 
-    const status = await getCsvProcessingStatus(processId);
+  const status = await getCsvProcessingStatus(processId);
 
-    if (!status) {
-      throw new NotFoundError("Processing ID not found");
-    }
+  if (!status) {
+    throw new NotFoundError("Processing ID not found");
+  }
 
-    const response: HttpResponse<ProcessingResponse> = {
-      status:
-        status.status === "failed"
-          ? "error"
-          : status.status === "completed"
+  const response: HttpResponse<ProcessingResponse> = {
+    status:
+      status.status === "failed"
+        ? "error"
+        : status.status === "completed"
           ? "success"
           : "processing",
-      message:
-        status.status === "failed"
-          ? "Processing failed"
-          : "Processing status retrieved successfully",
-      data: formatProcessingResponse(status, processId),
-    };
+    message:
+      status.status === "failed" ? "Processing failed" : "Processing status retrieved successfully",
+    data: formatProcessingResponse(status, processId),
+  };
 
-    if (status.status === "failed") {
-      return res.status(422).json(response);
-    }
-
-    res.json(response);
+  if (status.status === "failed") {
+    return res.status(422).json(response);
   }
-);
+
+  res.json(response);
+});

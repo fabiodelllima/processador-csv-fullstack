@@ -10,9 +10,7 @@ export const validateDocument = (document: string): boolean => {
   if (document.length === 11) return validateCpf(document);
   if (document.length === 14) return validateCnpj(document);
 
-  throw new ValidationError(
-    "Document must be either CPF (11 digits) or CNPJ (14 digits)"
-  );
+  throw new ValidationError("Document must be either CPF (11 digits) or CNPJ (14 digits)");
 };
 
 const validateCpf = (cpf: string): boolean => {
@@ -65,9 +63,7 @@ const validateCnpj = (cnpj: string): boolean => {
   let result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
 
   if (result !== parseInt(cnpj.charAt(12))) {
-    throw new ValidationError(
-      "Invalid CNPJ: first check digit validation failed"
-    );
+    throw new ValidationError("Invalid CNPJ: first check digit validation failed");
   }
 
   sum = 0;
@@ -81,9 +77,7 @@ const validateCnpj = (cnpj: string): boolean => {
   result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
 
   if (result !== parseInt(cnpj.charAt(13))) {
-    throw new ValidationError(
-      "Invalid CNPJ: second check digit validation failed"
-    );
+    throw new ValidationError("Invalid CNPJ: second check digit validation failed");
   }
 
   return true;

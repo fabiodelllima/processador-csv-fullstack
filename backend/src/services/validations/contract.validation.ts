@@ -20,9 +20,7 @@ export const validateContract = (data: FileData): boolean => {
   }
 
   if (data.qtPrestacoes <= 0) {
-    throw new ValidationError(
-      "Number of installments must be greater than zero"
-    );
+    throw new ValidationError("Number of installments must be greater than zero");
   }
 
   return true;

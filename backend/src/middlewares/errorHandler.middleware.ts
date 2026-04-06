@@ -3,12 +3,7 @@ import { MulterError } from "multer";
 import { AppError } from "../errors/AppError";
 import { HttpResponse } from "../interfaces";
 
-export const errorHandler = (
-  error: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction) => {
   console.error("[Error]:", {
     name: error.name,
     message: error.message,
@@ -42,17 +37,14 @@ export const errorHandler = (
 
   const response: HttpResponse = {
     status: "error",
-    message:
-      process.env.NODE_ENV === "production"
-        ? "Internal server error"
-        : error.message,
+    message: process.env.NODE_ENV === "production" ? "Internal server error" : error.message,
   };
 
   return res.status(500).json(response);
 };
 
 export const asyncErrorHandler = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
+  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>,
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);

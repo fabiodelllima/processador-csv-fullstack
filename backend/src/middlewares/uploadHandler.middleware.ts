@@ -18,15 +18,9 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (
-  req: Request,
-  file: Express.Multer.File,
-  cb: multer.FileFilterCallback
-) => {
+const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   if (
-    !env.upload.allowedMimetypes.includes(
-      file.mimetype as "text/csv" | "application/vnd.ms-excel"
-    )
+    !env.upload.allowedMimetypes.includes(file.mimetype as "text/csv" | "application/vnd.ms-excel")
   ) {
     cb(new ValidationError("Invalid file type. Only CSV files are allowed."));
     return;
