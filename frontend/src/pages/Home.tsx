@@ -48,8 +48,8 @@ export const Home = () => {
                 </div>
               )}
             </div>
-            <button
-              onClick={processFile}
+            <button type="button"
+              onClick={() => void processFile()}
               disabled={isButtonDisabled}
               className={`h-12 bg-blue-600/90 text-gray-100 rounded-lg transition-all duration-200
                         ${
@@ -131,8 +131,8 @@ export const Home = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-700">
-                  {result.data.data.map((record, index) => (
-                    <tr key={index} className="hover:bg-gray-700/50">
+                  {result.data.data.map((record) => (
+                    <tr key={record.nrContrato} className="hover:bg-gray-700/50">
                       <td className="p-3 whitespace-nowrap">{record.nmClient}</td>
                       <td className="p-3 whitespace-nowrap">{record.nrCpfCnpj}</td>
                       <td className="p-3 whitespace-nowrap">{record.nrContrato}</td>
