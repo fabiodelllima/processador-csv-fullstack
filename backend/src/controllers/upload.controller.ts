@@ -3,7 +3,7 @@ import { asyncErrorHandler } from "../middlewares/errorHandler.middleware";
 import { ValidationError } from "../errors/ValidationError";
 import { HttpResponse, UploadData } from "../interfaces";
 import { processCsv } from "../services/csv.service";
-import { validateFileUpload } from "../services/validations/file.validation";
+import { validateFileUpload, validateFileHeaders } from "../services/validations/file.validation";
 
 export const upload = asyncErrorHandler(async (req: Request, res: Response) => {
   if (!req.file) {
@@ -11,6 +11,7 @@ export const upload = asyncErrorHandler(async (req: Request, res: Response) => {
   }
 
   const processId = await validateFileUpload(req.file);
+  await validateFileHeaders(req.file.path);
 
   processCsv(req.file.path, processId).catch((error) => {
     console.error("Background processing failed:", error);

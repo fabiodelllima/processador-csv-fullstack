@@ -1,4 +1,6 @@
 import { ValidationError } from "../../errors/ValidationError";
+import { createReadStream } from "fs";
+import { createInterface } from "readline";
 
 const REQUIRED_COLUMNS = [
   "nrInst",
@@ -30,18 +32,30 @@ const REQUIRED_COLUMNS = [
   "idSitVen",
 ] as const;
 
-const validateFileStructure = async (headers: string[]): Promise<void> => {
-  const cleanHeaders = headers.map((header) =>
-    header.trim().replace(/[\r\n"]/g, "")
-  );
+export const validateFileHeaders = async (filePath: string): Promise<void> => {
+  const stream = createReadStream(filePath);
+  const rl = createInterface({ input: stream, crlfDelay: Infinity });
+
+  const firstLine = await new Promise<string>((resolve, reject) => {
+    rl.on("line", (line: string) => {
+      rl.close();
+      stream.destroy();
+      resolve(line);
+    });
+    rl.on("error", reject);
+  });
+
+  const headers = firstLine
+    .split(",")
+    .map((h) => h.trim().replace(/[\r\n"]/g, ""));
 
   const missingColumns = REQUIRED_COLUMNS.filter(
-    (column) => !cleanHeaders.includes(column)
+    (column) => !headers.includes(column),
   );
 
   if (missingColumns.length > 0) {
     throw new ValidationError(
-      `Missing required columns: ${missingColumns.join(", ")}`
+      `Missing required columns: ${missingColumns.join(", ")}`,
     );
   }
 };
@@ -51,9 +65,9 @@ const validateFileContent = (file: Express.Multer.File): void => {
     throw new ValidationError("File is empty");
   }
 
-  const maxSize = 10 * 1024 * 1024;
+  const maxSize = 30 * 1024 * 1024;
   if (file.size > maxSize) {
-    throw new ValidationError("File size exceeds 10MB limit");
+    throw new ValidationError("File size exceeds 30MB limit");
   }
 
   if (!file.mimetype.includes("csv")) {
@@ -62,7 +76,7 @@ const validateFileContent = (file: Express.Multer.File): void => {
 };
 
 export const validateFileUpload = async (
-  file: Express.Multer.File
+  file: Express.Multer.File,
 ): Promise<string> => {
   if (!file) {
     throw new ValidationError("No file uploaded");
