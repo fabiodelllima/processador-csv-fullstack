@@ -10,7 +10,7 @@ export const upload = asyncErrorHandler(async (req: Request, res: Response) => {
     throw new ValidationError("No file uploaded");
   }
 
-  const processId = await validateFileUpload(req.file);
+  const processId = validateFileUpload(req.file);
   await validateFileHeaders(req.file.path);
 
   processCsv(req.file.path, processId).catch((error) => {

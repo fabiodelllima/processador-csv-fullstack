@@ -69,7 +69,7 @@ const validateFileContent = (file: Express.Multer.File): void => {
   }
 };
 
-export const validateFileUpload = async (file: Express.Multer.File): Promise<string> => {
+export const validateFileUpload = (file: Express.Multer.File): string => {
   if (!file) {
     throw new ValidationError("No file uploaded");
   }
