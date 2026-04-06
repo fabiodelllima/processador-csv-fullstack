@@ -36,7 +36,6 @@ export const useCsvProcessor = () => {
 
       if (uploadResponse.data?.processId) {
         setProcessId(uploadResponse.data.processId);
-        console.log(processId);
         await checkStatus(uploadResponse.data.processId);
       } else {
         throw new Error("No process ID received");
