@@ -1,10 +1,7 @@
-import { RecordData, ResultData } from "../interfaces";
-import { SuccessData } from "../interfaces/csv/success.interface";
+import type { RecordData, ResultData } from "../interfaces";
+import type { SuccessData } from "../interfaces/csv/success.interface";
 
-export const formatProcessingResponse = (
-  status: ResultData,
-  processId: string,
-) => {
+export const formatProcessingResponse = (status: ResultData, processId: string) => {
   if (!status.result) {
     return {
       processId,
@@ -28,9 +25,7 @@ export const formatProcessingResponse = (
   } as const;
 };
 
-export const formatDataResponse = (
-  result: NonNullable<ResultData["result"]>,
-) => {
+export const formatDataResponse = (result: NonNullable<ResultData["result"]>) => {
   return {
     data: result.data,
     summary: {
@@ -46,16 +41,12 @@ export const formatDataResponse = (
 
 const countValidRecords = (records: RecordData[]): number =>
   records.filter(
-    (record) =>
-      record.cpfCnpjValido && record.contratoValido && record.prestacaoValida,
+    (record) => record.cpfCnpjValido && record.contratoValido && record.prestacaoValida,
   ).length;
 
 const countInvalidRecords = (records: RecordData[]): number =>
   records.filter(
-    (record) =>
-      !record.cpfCnpjValido ||
-      !record.contratoValido ||
-      !record.prestacaoValida,
+    (record) => !record.cpfCnpjValido || !record.contratoValido || !record.prestacaoValida,
   ).length;
 
 export const parseDecimalNumber = (value: string | number): number => {

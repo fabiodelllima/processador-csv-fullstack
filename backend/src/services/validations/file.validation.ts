@@ -1,6 +1,6 @@
+import { createReadStream } from "node:fs";
+import { createInterface } from "node:readline";
 import { ValidationError } from "../../errors/ValidationError";
-import { createReadStream } from "fs";
-import { createInterface } from "readline";
 
 const REQUIRED_COLUMNS = [
   "nrInst",
@@ -45,18 +45,12 @@ export const validateFileHeaders = async (filePath: string): Promise<void> => {
     rl.on("error", reject);
   });
 
-  const headers = firstLine
-    .split(",")
-    .map((h) => h.trim().replace(/[\r\n"]/g, ""));
+  const headers = firstLine.split(",").map((h) => h.trim().replace(/[\r\n"]/g, ""));
 
-  const missingColumns = REQUIRED_COLUMNS.filter(
-    (column) => !headers.includes(column),
-  );
+  const missingColumns = REQUIRED_COLUMNS.filter((column) => !headers.includes(column));
 
   if (missingColumns.length > 0) {
-    throw new ValidationError(
-      `Missing required columns: ${missingColumns.join(", ")}`,
-    );
+    throw new ValidationError(`Missing required columns: ${missingColumns.join(", ")}`);
   }
 };
 
@@ -75,9 +69,7 @@ const validateFileContent = (file: Express.Multer.File): void => {
   }
 };
 
-export const validateFileUpload = async (
-  file: Express.Multer.File,
-): Promise<string> => {
+export const validateFileUpload = (file: Express.Multer.File): string => {
   if (!file) {
     throw new ValidationError("No file uploaded");
   }

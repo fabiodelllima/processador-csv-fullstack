@@ -1,4 +1,4 @@
-import { FileData } from "./file.interface";
+import type { FileData } from "./file.interface";
 
 export interface RecordData extends FileData {
   cpfCnpjValido: boolean;

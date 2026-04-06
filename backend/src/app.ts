@@ -1,10 +1,9 @@
-import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-
-import { csvRoutes } from "./routes/csv.route";
-import { errorHandler } from "./middlewares/errorHandler.middleware";
+import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import { env } from "./config/env.config";
+import { errorHandler } from "./middlewares/errorHandler.middleware";
+import { csvRoutes } from "./routes/csv.route";
 
 dotenv.config();
 
@@ -20,7 +19,7 @@ app.use(express.json());
 
 app.use("/api/csv", csvRoutes);
 
-app.get("/health", (req, res) => {
+app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
