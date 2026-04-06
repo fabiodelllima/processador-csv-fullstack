@@ -22,25 +22,25 @@ const validateCpf = (cpf: string): boolean => {
   let remainder: number;
 
   for (let i = 1; i <= 9; i++) {
-    sum = sum + parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    sum = sum + parseInt(cpf.substring(i - 1, i), 10) * (11 - i);
   }
 
   remainder = (sum * 10) % 11;
 
   if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(cpf.substring(9, 10))) {
+  if (remainder !== parseInt(cpf.substring(9, 10), 10)) {
     throw new ValidationError("Invalid CPF: check digit validation failed");
   }
 
   sum = 0;
   for (let i = 1; i <= 10; i++) {
-    sum = sum + parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    sum = sum + parseInt(cpf.substring(i - 1, i), 10) * (12 - i);
   }
 
   remainder = (sum * 10) % 11;
 
   if (remainder === 10 || remainder === 11) remainder = 0;
-  if (remainder !== parseInt(cpf.substring(10, 11))) {
+  if (remainder !== parseInt(cpf.substring(10, 11), 10)) {
     throw new ValidationError("Invalid CPF: check digit validation failed");
   }
 
@@ -56,13 +56,13 @@ const validateCnpj = (cnpj: string): boolean => {
   let pos = 5;
 
   for (let i = 0; i < 12; i++) {
-    sum += parseInt(cnpj.charAt(i)) * pos--;
+    sum += parseInt(cnpj.charAt(i), 10) * pos--;
     if (pos < 2) pos = 9;
   }
 
   let result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
 
-  if (result !== parseInt(cnpj.charAt(12))) {
+  if (result !== parseInt(cnpj.charAt(12), 10)) {
     throw new ValidationError("Invalid CNPJ: first check digit validation failed");
   }
 
@@ -70,13 +70,13 @@ const validateCnpj = (cnpj: string): boolean => {
   pos = 6;
 
   for (let i = 0; i < 13; i++) {
-    sum += parseInt(cnpj.charAt(i)) * pos--;
+    sum += parseInt(cnpj.charAt(i), 10) * pos--;
     if (pos < 2) pos = 9;
   }
 
   result = sum % 11 < 2 ? 0 : 11 - (sum % 11);
 
-  if (result !== parseInt(cnpj.charAt(13))) {
+  if (result !== parseInt(cnpj.charAt(13), 10)) {
     throw new ValidationError("Invalid CNPJ: second check digit validation failed");
   }
 
