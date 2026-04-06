@@ -11,12 +11,20 @@ import { env } from "../config/env.config";
 
 const processings = new Map<string, ResultData>();
 
-/**
- * Strips directory components from the given file path and rebuilds it
- * relative to the configured upload directory. This prevents path
- * traversal by construction — path.basename is a CodeQL-recognized
- * sanitizer that eliminates all directory segments.
- */
+const PROCESSING_TTL_MS = 30 * 60 * 1000;
+
+const cleanupExpiredProcessings = (): void => {
+  const now = Date.now();
+  for (const [key, value] of processings) {
+    const endTime = value.result?.summary?.endTime;
+    if (endTime && now - new Date(endTime).getTime() > PROCESSING_TTL_MS) {
+      processings.delete(key);
+    }
+  }
+};
+
+setInterval(cleanupExpiredProcessings, 5 * 60 * 1000);
+
 const toSafeUploadPath = (filePath: string): string => {
   const fileName = path.basename(filePath);
   return path.join(path.resolve(env.upload.folder), fileName);
@@ -24,7 +32,7 @@ const toSafeUploadPath = (filePath: string): string => {
 
 const processRecord = async (
   record: any,
-  lineNumber: number
+  lineNumber: number,
 ): Promise<[RecordData | null, ErrorData[], SuccessData[]]> => {
   const errors: ErrorData[] = [];
   const successes: SuccessData[] = [];
@@ -65,7 +73,7 @@ const processRecord = async (
     let prestacaoValida = false;
 
     try {
-      cpfCnpjValido = await validateDocument(data.nrCpfCnpj);
+      cpfCnpjValido = validateDocument(data.nrCpfCnpj);
       successes.push({
         line: lineNumber,
         field: "nrCpfCnpj",
@@ -82,7 +90,7 @@ const processRecord = async (
     }
 
     try {
-      contratoValido = await validateContract(data);
+      contratoValido = validateContract(data);
       successes.push({
         line: lineNumber,
         field: "contract",
@@ -99,10 +107,10 @@ const processRecord = async (
     }
 
     try {
-      prestacaoValida = await validateInstallment(
+      prestacaoValida = validateInstallment(
         data.vlTotal,
         data.vlPresta,
-        data.qtPrestacoes
+        data.qtPrestacoes,
       );
       successes.push({
         line: lineNumber,
@@ -141,7 +149,7 @@ const processRecord = async (
 
 export const processCsv = async (
   filePath: string,
-  fileId: string
+  fileId: string,
 ): Promise<void> => {
   const startTime = new Date();
   const safePath = toSafeUploadPath(filePath);
@@ -187,7 +195,7 @@ export const processCsv = async (
           lineNumber++;
           const [data, errors, successes] = await processRecord(
             record,
-            lineNumber
+            lineNumber,
           );
 
           if (data) {
@@ -216,7 +224,7 @@ export const processCsv = async (
 
     const validRecords = processedData.filter(
       (record) =>
-        record.cpfCnpjValido && record.contratoValido && record.prestacaoValida
+        record.cpfCnpjValido && record.contratoValido && record.prestacaoValida,
     );
 
     processings.set(fileId, {
@@ -232,7 +240,7 @@ export const processCsv = async (
           processingTime,
           totalValue: validRecords.reduce(
             (sum, record) => sum + record.vlTotal,
-            0
+            0,
           ),
           startTime,
           endTime,
@@ -259,7 +267,7 @@ export const processCsv = async (
 };
 
 export const getCsvProcessingStatus = (
-  fileId: string
+  fileId: string,
 ): ResultData | undefined => {
   return processings.get(fileId);
 };
