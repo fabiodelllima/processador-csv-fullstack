@@ -32,7 +32,7 @@ export const env = {
     nodeEnv: process.env.NODE_ENV,
   },
   upload: {
-    folder: process.env.UPLOAD_FOLDER,
+    folder: process.env.UPLOAD_FOLDER!,
     maxSize: UPLOAD_CONSTANTS.MAX_FILE_SIZE,
     allowedMimetypes: UPLOAD_CONSTANTS.ALLOWED_MIMETYPES,
   },

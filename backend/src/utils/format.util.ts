@@ -3,7 +3,7 @@ import { SuccessData } from "../interfaces/csv/success.interface";
 
 export const formatProcessingResponse = (
   status: ResultData,
-  processId: string
+  processId: string,
 ) => {
   if (!status.result) {
     return {
@@ -29,7 +29,7 @@ export const formatProcessingResponse = (
 };
 
 export const formatDataResponse = (
-  result: NonNullable<ResultData["result"]>
+  result: NonNullable<ResultData["result"]>,
 ) => {
   return {
     data: result.data,
@@ -47,19 +47,24 @@ export const formatDataResponse = (
 const countValidRecords = (records: RecordData[]): number =>
   records.filter(
     (record) =>
-      record.cpfCnpjValido && record.contratoValido && record.prestacaoValida
+      record.cpfCnpjValido && record.contratoValido && record.prestacaoValida,
   ).length;
 
 const countInvalidRecords = (records: RecordData[]): number =>
   records.filter(
     (record) =>
-      !record.cpfCnpjValido || !record.contratoValido || !record.prestacaoValida
+      !record.cpfCnpjValido ||
+      !record.contratoValido ||
+      !record.prestacaoValida,
   ).length;
 
-// "1.234,56" => 1234.56
 export const parseDecimalNumber = (value: string | number): number => {
   if (typeof value === "number") return value;
-  return Number(String(value).replace(/[^\d.-]/g, ""));
+  const str = String(value);
+  if (str.includes(",")) {
+    return Number(str.replace(/\./g, "").replace(",", "."));
+  }
+  return Number(str.replace(/[^\d.-]/g, ""));
 };
 
 // "1.234" => 1234
