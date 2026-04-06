@@ -31,7 +31,7 @@ const toSafeUploadPath = (filePath: string): string => {
 };
 
 const processRecord = (
-  record: any,
+  record: Record<string, string>,
   lineNumber: number,
 ): [RecordData | null, ErrorData[], SuccessData[]] => {
   const errors: ErrorData[] = [];
@@ -183,8 +183,8 @@ export const processCsv = async (filePath: string, fileId: string): Promise<void
       const fileStream = fs.createReadStream(safePath);
 
       parser.on("readable", () => {
-        let record;
-        while ((record = parser.read()) !== null) {
+        let record: Record<string, string> | null = parser.read();
+        while (record !== null) {
           lineNumber++;
           const [data, errors, successes] = processRecord(record, lineNumber);
 
@@ -193,6 +193,7 @@ export const processCsv = async (filePath: string, fileId: string): Promise<void
           }
           allErrors.push(...errors);
           allSuccesses.push(...successes);
+          record = parser.read();
         }
       });
 
