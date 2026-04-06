@@ -1,0 +1,24 @@
+{
+  "name": "processador-csv-fullstack",
+  "version": "1.0.0",
+  "description": "![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=nodedotjs&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white) ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabiodelllima/processador-csv-fullstack.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/fabiodelllima/processador-csv-fullstack/issues"
+  },
+  "homepage": "https://github.com/fabiodelllima/processador-csv-fullstack#readme",
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.10"
+  }
+}
