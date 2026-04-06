@@ -35,7 +35,6 @@ export const useCsvProcessor = () => {
       const uploadResponse = await csvService.upload(file);
 
       if (uploadResponse.data?.processId) {
-        
         await checkStatus(uploadResponse.data.processId);
       } else {
         throw new Error("No process ID received");

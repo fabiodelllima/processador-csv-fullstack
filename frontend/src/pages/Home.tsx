@@ -48,7 +48,8 @@ export const Home = () => {
                 </div>
               )}
             </div>
-            <button type="button"
+            <button
+              type="button"
               onClick={() => void processFile()}
               disabled={isButtonDisabled}
               className={`h-12 bg-blue-600/90 text-gray-100 rounded-lg transition-all duration-200
