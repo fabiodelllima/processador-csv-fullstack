@@ -1,5 +1,5 @@
-import { RecordData, ResultData } from "../interfaces";
-import { SuccessData } from "../interfaces/csv/success.interface";
+import type { RecordData, ResultData } from "../interfaces";
+import type { SuccessData } from "../interfaces/csv/success.interface";
 
 export const formatProcessingResponse = (status: ResultData, processId: string) => {
   if (!status.result) {

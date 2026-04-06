@@ -1,6 +1,6 @@
-import { ErrorData } from "./error.interface";
-import { RecordData } from "./record.interface";
-import { SuccessData } from "./success.interface";
+import type { ErrorData } from "./error.interface";
+import type { RecordData } from "./record.interface";
+import type { SuccessData } from "./success.interface";
 
 export type ProcessingStatus = "processing" | "completed" | "failed";
 

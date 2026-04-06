@@ -1,10 +1,10 @@
-import { Request, Response } from "express";
-import { asyncErrorHandler } from "../middlewares/errorHandler.middleware";
-import { ValidationError } from "../errors/ValidationError";
+import type { Request, Response } from "express";
 import { NotFoundError } from "../errors/NotFoundError";
+import { ValidationError } from "../errors/ValidationError";
+import type { HttpResponse } from "../interfaces";
+import { asyncErrorHandler } from "../middlewares/errorHandler.middleware";
 import { getCsvProcessingStatus } from "../services/csv.service";
 import { formatProcessingResponse } from "../utils/format.util";
-import { HttpResponse, ResultData } from "../interfaces";
 
 type ProcessingResponse = ReturnType<typeof formatProcessingResponse>;
 

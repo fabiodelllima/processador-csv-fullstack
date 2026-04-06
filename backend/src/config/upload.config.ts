@@ -1,18 +1,18 @@
+import path from "node:path";
+import type { Request } from "express";
 import multer from "multer";
-import path from "path";
-import { Request } from "express";
-import { env } from "./env.config";
 import { ValidationError } from "../errors/ValidationError";
+import { env } from "./env.config";
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
+  destination: (_req, _file, cb) => {
     if (env.upload.folder) {
       cb(null, env.upload.folder);
     } else {
       cb(new Error("Upload folder not found"), "");
     }
   },
-  filename: (req, file, cb) => {
+  filename: (_req, file, cb) => {
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
     const sanitizedName = path.basename(file.originalname).replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   if (
     !env.upload.allowedMimetypes.includes(file.mimetype as "text/csv" | "application/vnd.ms-excel")
   ) {

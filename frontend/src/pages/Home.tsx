@@ -1,5 +1,5 @@
-import { StatusDots } from "../components/StatusDots";
 import { Loader } from "../components/Loader";
+import { StatusDots } from "../components/StatusDots";
 import { useCsvProcessor } from "../hooks/useCsvProcessor";
 
 const translateStatus = (status: string) => {

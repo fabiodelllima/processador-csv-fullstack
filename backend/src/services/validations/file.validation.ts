@@ -1,6 +1,6 @@
+import { createReadStream } from "node:fs";
+import { createInterface } from "node:readline";
 import { ValidationError } from "../../errors/ValidationError";
-import { createReadStream } from "fs";
-import { createInterface } from "readline";
 
 const REQUIRED_COLUMNS = [
   "nrInst",

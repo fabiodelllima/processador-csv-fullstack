@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
-import { asyncErrorHandler } from "../middlewares/errorHandler.middleware";
-import { ValidationError } from "../errors/ValidationError";
+import type { Request, Response } from "express";
 import { NotFoundError } from "../errors/NotFoundError";
 import { ProcessError } from "../errors/ProcessError";
+import { ValidationError } from "../errors/ValidationError";
+import type { HttpResponse } from "../interfaces";
+import { asyncErrorHandler } from "../middlewares/errorHandler.middleware";
 import { getCsvProcessingStatus } from "../services/csv.service";
 import { formatDataResponse } from "../utils/format.util";
-import { HttpResponse, RecordData } from "../interfaces";
 
 type DataResponse = ReturnType<typeof formatDataResponse>;
 
@@ -18,7 +18,7 @@ export const download = asyncErrorHandler(async (req: Request, res: Response) =>
 
   const status = await getCsvProcessingStatus(processId);
 
-  if (!status || !status.result) {
+  if (!status?.result) {
     throw new NotFoundError("Processed data not found");
   }
 

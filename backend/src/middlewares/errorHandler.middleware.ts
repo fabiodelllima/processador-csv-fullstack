@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { MulterError } from "multer";
 import { AppError } from "../errors/AppError";
-import { HttpResponse } from "../interfaces";
+import type { HttpResponse } from "../interfaces";
 
-export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (error: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error("[Error]:", {
     name: error.name,
     message: error.message,

@@ -1,13 +1,13 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { Parser } from "csv-parse";
-import { ErrorData, FileData, RecordData, ResultData } from "../interfaces";
-import { validateDocument } from "./validations/document.validation";
-import { validateContract } from "./validations/contract.validation";
-import { validateInstallment } from "./validations/installment.validation";
-import { parseDecimalNumber, parseWholeNumber } from "../utils/format.util";
-import { SuccessData } from "../interfaces/csv/success.interface";
 import { env } from "../config/env.config";
+import type { ErrorData, FileData, RecordData, ResultData } from "../interfaces";
+import type { SuccessData } from "../interfaces/csv/success.interface";
+import { parseDecimalNumber, parseWholeNumber } from "../utils/format.util";
+import { validateContract } from "./validations/contract.validation";
+import { validateDocument } from "./validations/document.validation";
+import { validateInstallment } from "./validations/installment.validation";
 
 const processings = new Map<string, ResultData>();
 

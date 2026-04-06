@@ -1,9 +1,9 @@
-import { Request, Response } from "express";
-import { asyncErrorHandler } from "../middlewares/errorHandler.middleware";
+import type { Request, Response } from "express";
 import { ValidationError } from "../errors/ValidationError";
-import { HttpResponse, UploadData } from "../interfaces";
+import type { HttpResponse, UploadData } from "../interfaces";
+import { asyncErrorHandler } from "../middlewares/errorHandler.middleware";
 import { processCsv } from "../services/csv.service";
-import { validateFileUpload, validateFileHeaders } from "../services/validations/file.validation";
+import { validateFileHeaders, validateFileUpload } from "../services/validations/file.validation";
 
 export const upload = asyncErrorHandler(async (req: Request, res: Response) => {
   if (!req.file) {

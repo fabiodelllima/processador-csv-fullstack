@@ -1,5 +1,5 @@
-import { FileData } from "../../interfaces";
 import { ValidationError } from "../../errors/ValidationError";
+import type { FileData } from "../../interfaces";
 
 export const validateContract = (data: FileData): boolean => {
   if (!data.nrContrato) {
