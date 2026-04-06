@@ -29,7 +29,7 @@ const UPLOAD_CONSTANTS = {
 export const env = {
   server: {
     port: Number(process.env.PORT),
-    nodeEnv: process.env.NODE_ENV,
+    nodeEnv: process.env.NODE_ENV!,
   },
   upload: {
     folder: process.env.UPLOAD_FOLDER!,
@@ -37,10 +37,13 @@ export const env = {
     allowedMimetypes: UPLOAD_CONSTANTS.ALLOWED_MIMETYPES,
   },
   database: {
-    host: process.env.DB_HOST,
+    host: process.env.DB_HOST!,
     port: Number(process.env.DB_PORT),
-    name: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
+    name: process.env.DB_NAME!,
+    user: process.env.DB_USER!,
+    password: process.env.DB_PASS!,
+  },
+  cors: {
+    origin: process.env.CORS_ORIGIN || "*",
   },
 };
