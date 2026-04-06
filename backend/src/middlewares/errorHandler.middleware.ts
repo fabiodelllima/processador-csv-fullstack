@@ -44,9 +44,9 @@ export const errorHandler = (error: Error, _req: Request, res: Response, _next: 
 };
 
 export const asyncErrorHandler = (
-  fn: (req: Request, res: Response, next: NextFunction) => Promise<any>,
+  fn: (_req: Request, res: Response, _next: NextFunction) => Promise<void> | void,
 ) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    void Promise.resolve(fn(req, res, _next)).catch(_next);
+    void Promise.resolve(fn(req, res, next)).catch(next);
   };
 };
