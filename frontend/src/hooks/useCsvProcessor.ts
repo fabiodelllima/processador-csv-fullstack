@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { ResultData } from "../interfaces/csv.interface";
+import type { ResultData } from "../interfaces/csv.interface";
 import { csvService } from "../services/csv.service";
 
 export const useCsvProcessor = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [processId, setProcessId] = useState<string | null>(null);
+  const [_processId, setProcessId] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ResultData | null>(null);
@@ -35,8 +35,6 @@ export const useCsvProcessor = () => {
       const uploadResponse = await csvService.upload(file);
 
       if (uploadResponse.data?.processId) {
-        setProcessId(uploadResponse.data.processId);
-        console.log(processId);
         await checkStatus(uploadResponse.data.processId);
       } else {
         throw new Error("No process ID received");

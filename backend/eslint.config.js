@@ -3,11 +3,14 @@ import tsparser from "@typescript-eslint/parser";
 
 export default [
   {
-    files: ["src/**/*.ts", "src/**/*.tsx"],
+    ignores: ["*.config.ts", "*.config.js"],
+  },
+  {
+    files: ["src/**/*.ts"],
     languageOptions: {
       parser: tsparser,
       parserOptions: {
-        project: "./tsconfig.app.json",
+        project: "./tsconfig.json",
         sourceType: "module",
       },
     },
@@ -18,8 +21,9 @@ export default [
       "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/no-misused-promises": "error",
       "@typescript-eslint/await-thenable": "error",
-      "@typescript-eslint/require-await": "warn",
+      "@typescript-eslint/require-await": "error",
       "@typescript-eslint/no-unnecessary-type-assertion": "warn",
+      "@typescript-eslint/strict-boolean-expressions": "warn",
     },
   },
 ];

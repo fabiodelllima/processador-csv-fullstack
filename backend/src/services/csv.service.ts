@@ -1,31 +1,39 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { Parser } from "csv-parse";
-import { ErrorData, FileData, RecordData, ResultData } from "../interfaces";
-import { validateDocument } from "./validations/document.validation";
-import { validateContract } from "./validations/contract.validation";
-import { validateInstallment } from "./validations/installment.validation";
-import { parseDecimalNumber, parseWholeNumber } from "../utils/format.util";
-import { SuccessData } from "../interfaces/csv/success.interface";
 import { env } from "../config/env.config";
+import type { ErrorData, FileData, RecordData, ResultData } from "../interfaces";
+import type { SuccessData } from "../interfaces/csv/success.interface";
+import { parseDecimalNumber, parseWholeNumber } from "../utils/format.util";
+import { validateContract } from "./validations/contract.validation";
+import { validateDocument } from "./validations/document.validation";
+import { validateInstallment } from "./validations/installment.validation";
 
 const processings = new Map<string, ResultData>();
 
-/**
- * Strips directory components from the given file path and rebuilds it
- * relative to the configured upload directory. This prevents path
- * traversal by construction — path.basename is a CodeQL-recognized
- * sanitizer that eliminates all directory segments.
- */
+const PROCESSING_TTL_MS = 30 * 60 * 1000;
+
+const cleanupExpiredProcessings = (): void => {
+  const now = Date.now();
+  for (const [key, value] of processings) {
+    const endTime = value.result?.summary?.endTime;
+    if (endTime && now - new Date(endTime).getTime() > PROCESSING_TTL_MS) {
+      processings.delete(key);
+    }
+  }
+};
+
+setInterval(cleanupExpiredProcessings, 5 * 60 * 1000);
+
 const toSafeUploadPath = (filePath: string): string => {
   const fileName = path.basename(filePath);
   return path.join(path.resolve(env.upload.folder), fileName);
 };
 
-const processRecord = async (
-  record: any,
-  lineNumber: number
-): Promise<[RecordData | null, ErrorData[], SuccessData[]]> => {
+const processRecord = (
+  record: Record<string, string>,
+  lineNumber: number,
+): [RecordData | null, ErrorData[], SuccessData[]] => {
   const errors: ErrorData[] = [];
   const successes: SuccessData[] = [];
 
@@ -65,7 +73,7 @@ const processRecord = async (
     let prestacaoValida = false;
 
     try {
-      cpfCnpjValido = await validateDocument(data.nrCpfCnpj);
+      cpfCnpjValido = validateDocument(data.nrCpfCnpj);
       successes.push({
         line: lineNumber,
         field: "nrCpfCnpj",
@@ -82,7 +90,7 @@ const processRecord = async (
     }
 
     try {
-      contratoValido = await validateContract(data);
+      contratoValido = validateContract(data);
       successes.push({
         line: lineNumber,
         field: "contract",
@@ -99,11 +107,7 @@ const processRecord = async (
     }
 
     try {
-      prestacaoValida = await validateInstallment(
-        data.vlTotal,
-        data.vlPresta,
-        data.qtPrestacoes
-      );
+      prestacaoValida = validateInstallment(data.vlTotal, data.vlPresta, data.qtPrestacoes);
       successes.push({
         line: lineNumber,
         field: "installment",
@@ -139,10 +143,7 @@ const processRecord = async (
   }
 };
 
-export const processCsv = async (
-  filePath: string,
-  fileId: string
-): Promise<void> => {
+export const processCsv = async (filePath: string, fileId: string): Promise<void> => {
   const startTime = new Date();
   const safePath = toSafeUploadPath(filePath);
 
@@ -181,20 +182,18 @@ export const processCsv = async (
     await new Promise<void>((resolve, reject) => {
       const fileStream = fs.createReadStream(safePath);
 
-      parser.on("readable", async () => {
-        let record;
-        while ((record = parser.read()) !== null) {
+      parser.on("readable", () => {
+        let record: Record<string, string> | null = parser.read();
+        while (record !== null) {
           lineNumber++;
-          const [data, errors, successes] = await processRecord(
-            record,
-            lineNumber
-          );
+          const [data, errors, successes] = processRecord(record, lineNumber);
 
           if (data) {
             processedData.push(data);
           }
           allErrors.push(...errors);
           allSuccesses.push(...successes);
+          record = parser.read();
         }
       });
 
@@ -210,13 +209,10 @@ export const processCsv = async (
     });
 
     const endTime = new Date();
-    const processingTime = `${
-      (endTime.getTime() - startTime.getTime()) / 1000
-    }s`;
+    const processingTime = `${(endTime.getTime() - startTime.getTime()) / 1000}s`;
 
     const validRecords = processedData.filter(
-      (record) =>
-        record.cpfCnpjValido && record.contratoValido && record.prestacaoValida
+      (record) => record.cpfCnpjValido && record.contratoValido && record.prestacaoValida,
     );
 
     processings.set(fileId, {
@@ -230,10 +226,7 @@ export const processCsv = async (
           validRecords: validRecords.length,
           invalidRecords: processedData.length - validRecords.length,
           processingTime,
-          totalValue: validRecords.reduce(
-            (sum, record) => sum + record.vlTotal,
-            0
-          ),
+          totalValue: validRecords.reduce((sum, record) => sum + record.vlTotal, 0),
           startTime,
           endTime,
         },
@@ -244,10 +237,7 @@ export const processCsv = async (
   } catch (error) {
     processings.set(fileId, {
       status: "failed",
-      error:
-        error instanceof Error
-          ? error.message
-          : "Unknown error processing file",
+      error: error instanceof Error ? error.message : "Unknown error processing file",
     });
 
     try {
@@ -258,8 +248,6 @@ export const processCsv = async (
   }
 };
 
-export const getCsvProcessingStatus = (
-  fileId: string
-): ResultData | undefined => {
+export const getCsvProcessingStatus = (fileId: string): ResultData | undefined => {
   return processings.get(fileId);
 };

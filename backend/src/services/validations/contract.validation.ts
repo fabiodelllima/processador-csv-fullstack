@@ -1,5 +1,5 @@
-import { FileData } from "../../interfaces";
 import { ValidationError } from "../../errors/ValidationError";
+import type { FileData } from "../../interfaces";
 
 export const validateContract = (data: FileData): boolean => {
   if (!data.nrContrato) {
@@ -12,7 +12,7 @@ export const validateContract = (data: FileData): boolean => {
 
   const dateRegex = /^\d{8}$/;
   if (!dateRegex.test(data.dtContrato)) {
-    throw new ValidationError("Invalid contract date format. Use YYYY-MM-DD");
+    throw new ValidationError("Invalid contract date format. Expected 8 digits (YYYYMMDD)");
   }
 
   if (data.vlTotal <= 0) {
@@ -20,9 +20,7 @@ export const validateContract = (data: FileData): boolean => {
   }
 
   if (data.qtPrestacoes <= 0) {
-    throw new ValidationError(
-      "Number of installments must be greater than zero"
-    );
+    throw new ValidationError("Number of installments must be greater than zero");
   }
 
   return true;
