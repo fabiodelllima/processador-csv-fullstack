@@ -1,6 +1,14 @@
 # Processador CSV
 
+![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=nodedotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
+
 Desafio técnico fullstack para processamento e validação de grandes volumes de dados financeiros em CSV (~30 GB). A aplicação lê registros de contratos via streaming, valida o CPF/CNPJ com algoritmo próprio (sem bibliotecas externas), verifica a consistência entre valor total e prestações, e formata valores monetários em BRL — exibindo os resultados em uma interface web com indicadores visuais por registro.
+
+<!-- TODO: Adicionar screenshot da interface com dados processados -->
+<!-- ![Preview](docs/assets/preview.png) -->
 
 ---
 
@@ -83,29 +91,29 @@ frontend/src/
 
 Os arquivos de entrada contêm registros de contratos financeiros com as seguintes colunas:
 
-| Campo | Descrição |
-|-------|-----------|
-| `nrInst` | Número da Instituição |
-| `nrAgencia` | Número da Agência |
-| `cdClient` / `nmClient` | Código e nome do cliente |
-| `nrCpfCnpj` | CPF ou CNPJ (alvo de validação) |
-| `nrContrato` / `dtContrato` | Número e data do contrato |
-| `qtPrestacoes` | Quantidade de prestações |
-| `vlTotal` | Valor total do contrato |
-| `vlPresta` | Valor da prestação (comparado com `vlTotal / qtPrestacoes`) |
+| Campo                                                | Descrição                                                               |
+| ---------------------------------------------------- | ----------------------------------------------------------------------- |
+| `nrInst`                                             | Número da Instituição                                                   |
+| `nrAgencia`                                          | Número da Agência                                                       |
+| `cdClient` / `nmClient`                              | Código e nome do cliente                                                |
+| `nrCpfCnpj`                                          | CPF ou CNPJ (alvo de validação)                                         |
+| `nrContrato` / `dtContrato`                          | Número e data do contrato                                               |
+| `qtPrestacoes`                                       | Quantidade de prestações                                                |
+| `vlTotal`                                            | Valor total do contrato                                                 |
+| `vlPresta`                                           | Valor da prestação (comparado com `vlTotal / qtPrestacoes`)             |
 | `vlMora`, `vlMulta`, `vlOutAcr`, `vlIof`, `vlDescon` | Componentes financeiros (mora, multa, outros acréscimos, IOF, desconto) |
-| `vlAtual` | Valor atual |
-| `idSituac` / `idSitVen` | Situação e situação de vencimento |
+| `vlAtual`                                            | Valor atual                                                             |
+| `idSituac` / `idSitVen`                              | Situação e situação de vencimento                                       |
 
 ---
 
 ## Stack
 
-| Camada | Tecnologias |
-|--------|-------------|
-| Backend | Node.js, TypeScript, Express, csv-parser, PostgreSQL |
-| Frontend | React 18, TypeScript, Vite, Tailwind CSS |
-| Infra | Docker (opcional), dotenv |
+| Camada   | Tecnologias                                          |
+| -------- | ---------------------------------------------------- |
+| Backend  | Node.js, TypeScript, Express, csv-parser, PostgreSQL |
+| Frontend | React 18, TypeScript, Vite, Tailwind CSS             |
+| Infra    | Docker (opcional), dotenv                            |
 
 ---
 
