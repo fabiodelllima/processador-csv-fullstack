@@ -2,28 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { Parser } from "csv-parse";
 import { env } from "../config/env.config";
-import type { ErrorData, FileData, RecordData, ResultData } from "../interfaces";
+import type { ErrorData, FileData, RecordData } from "../interfaces";
 import type { SuccessData } from "../interfaces/csv/success.interface";
+import type { ResultData } from "../interfaces/csv/result.interface";
 import { parseDecimalNumber, parseWholeNumber } from "../utils/format.util";
 import { validateContract } from "./validations/contract.validation";
 import { validateDocument } from "./validations/document.validation";
 import { validateInstallment } from "./validations/installment.validation";
-
-const processings = new Map<string, ResultData>();
-
-const PROCESSING_TTL_MS = 30 * 60 * 1000;
-
-const cleanupExpiredProcessings = (): void => {
-  const now = Date.now();
-  for (const [key, value] of processings) {
-    const endTime = value.result?.summary?.endTime;
-    if (endTime && now - new Date(endTime).getTime() > PROCESSING_TTL_MS) {
-      processings.delete(key);
-    }
-  }
-};
-
-setInterval(cleanupExpiredProcessings, 5 * 60 * 1000);
+import * as repo from "../database/repository";
 
 const toSafeUploadPath = (filePath: string): string => {
   const fileName = path.basename(filePath);
@@ -148,23 +134,7 @@ export const processCsv = async (filePath: string, fileId: string): Promise<void
   const safePath = toSafeUploadPath(filePath);
 
   try {
-    processings.set(fileId, {
-      status: "processing",
-      result: {
-        data: [],
-        errors: [],
-        successes: [],
-        summary: {
-          totalRecords: 0,
-          validRecords: 0,
-          invalidRecords: 0,
-          processingTime: "0s",
-          totalValue: 0,
-          startTime,
-          endTime: startTime,
-        },
-      },
-    });
+    await repo.createProcessing(fileId);
 
     const parser = new Parser({
       columns: true,
@@ -176,7 +146,6 @@ export const processCsv = async (filePath: string, fileId: string): Promise<void
     const processedData: RecordData[] = [];
     const allErrors: ErrorData[] = [];
     const allSuccesses: SuccessData[] = [];
-
     let lineNumber = 0;
 
     await new Promise<void>((resolve, reject) => {
@@ -187,7 +156,6 @@ export const processCsv = async (filePath: string, fileId: string): Promise<void
         while (record !== null) {
           lineNumber++;
           const [data, errors, successes] = processRecord(record, lineNumber);
-
           if (data) {
             processedData.push(data);
           }
@@ -215,39 +183,68 @@ export const processCsv = async (filePath: string, fileId: string): Promise<void
       (record) => record.cpfCnpjValido && record.contratoValido && record.prestacaoValida,
     );
 
-    processings.set(fileId, {
-      status: "completed",
-      result: {
-        data: processedData,
-        errors: allErrors,
-        successes: allSuccesses,
-        summary: {
-          totalRecords: processedData.length,
-          validRecords: validRecords.length,
-          invalidRecords: processedData.length - validRecords.length,
-          processingTime,
-          totalValue: validRecords.reduce((sum, record) => sum + record.vlTotal, 0),
-          startTime,
-          endTime,
-        },
-      },
+    await repo.insertRecords(fileId, processedData);
+    await repo.insertErrors(fileId, allErrors);
+    await repo.insertSuccesses(fileId, allSuccesses);
+    await repo.completeProcessing(fileId, {
+      totalRecords: processedData.length,
+      validRecords: validRecords.length,
+      invalidRecords: processedData.length - validRecords.length,
+      processingTime,
+      totalValue: validRecords.reduce((sum, record) => sum + record.vlTotal, 0),
     });
 
     await fs.promises.unlink(safePath);
   } catch (error) {
-    processings.set(fileId, {
-      status: "failed",
-      error: error instanceof Error ? error.message : "Unknown error processing file",
-    });
+    await repo.failProcessing(
+      fileId,
+      error instanceof Error ? error.message : "Unknown error processing file",
+    );
 
     try {
       await fs.promises.unlink(safePath);
-    } catch (unlinkError) {
-      console.error("Error deleting file:", unlinkError);
+    } catch {
+      // File may not exist if error occurred before processing
     }
   }
 };
 
-export const getCsvProcessingStatus = (fileId: string): ResultData | undefined => {
-  return processings.get(fileId);
+export const getCsvProcessingStatus = async (fileId: string): Promise<ResultData | null> => {
+  const processing = await repo.getProcessingStatus(fileId);
+  if (!processing) return null;
+
+  if (processing.status === "failed") {
+    return {
+      status: "failed",
+      error: processing.error,
+    };
+  }
+
+  if (processing.status === "processing") {
+    return {
+      status: "processing",
+    };
+  }
+
+  const records = await repo.getProcessingRecords(fileId);
+  const errors = await repo.getProcessingErrors(fileId);
+  const successes = await repo.getProcessingSuccesses(fileId);
+
+  return {
+    status: "completed",
+    result: {
+      data: records,
+      errors,
+      successes,
+      summary: {
+        totalRecords: processing.total_records,
+        validRecords: processing.valid_records,
+        invalidRecords: processing.invalid_records,
+        processingTime: processing.processing_time,
+        totalValue: Number(processing.total_value),
+        startTime: processing.start_time,
+        endTime: processing.end_time,
+      },
+    },
+  };
 };
