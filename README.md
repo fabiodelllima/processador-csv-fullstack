@@ -4,6 +4,8 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-35%20passed-brightgreen)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
 Desafio técnico fullstack para processamento e validação de grandes volumes de dados financeiros em CSV (~30 GB). A aplicação lê registros de contratos via streaming, valida o CPF/CNPJ com algoritmo próprio (sem bibliotecas externas), verifica a consistência entre valor total e prestações, e formata valores monetários em BRL — exibindo os resultados em uma interface web com indicadores visuais por registro.
 
@@ -20,6 +22,7 @@ Desafio técnico fullstack para processamento e validação de grandes volumes d
   - [Frontend](#frontend)
 - [Estrutura do CSV](#estrutura-do-csv)
 - [Stack](#stack)
+- [Testes](#testes)
 - [Uso](#uso)
 
 ---
@@ -51,6 +54,9 @@ A arquitetura separa responsabilidades em camadas bem definidas: os controllers 
 ```
 backend/src/
 ├── controllers/                      # Upload, download, status de processamento
+├── database/
+│   ├── migrations/                   # Scripts SQL de criação do schema
+│   └── repository.ts                 # Camada de acesso ao PostgreSQL
 ├── services/
 │   ├── csv.service.ts                # Orquestração do fluxo de processamento
 │   └── validations/
@@ -113,19 +119,52 @@ Os arquivos de entrada contêm registros de contratos financeiros com as seguint
 | -------- | ---------------------------------------------------- |
 | Backend  | Node.js, TypeScript, Express, csv-parser, PostgreSQL |
 | Frontend | React 18, TypeScript, Vite, Tailwind CSS             |
-| Infra    | Docker (opcional), dotenv                            |
+| Testes   | Vitest, @vitest/coverage-v8                          |
+| Lint     | Biome, ESLint (type-aware)                           |
+| Infra    | Docker Compose, dotenv                               |
+
+---
+
+## Testes
+
+O backend possui 35 testes unitários cobrindo as regras de negócio centrais do processamento, executados com **Vitest**:
+
+```bash
+cd backend
+npm test              # Executa todos os testes
+npm run test:coverage # Executa com relatório de cobertura
+```
+
+| Suite                  | Testes | Cobertura |
+| ---------------------- | ------ | --------- |
+| Validação de CPF/CNPJ  | 12     | 96%       |
+| Validação de prestação | 7      | 100%      |
+| Validação de contrato  | 6      | 100%      |
+| Parsing numérico (BRL) | 10     | 65%       |
+| **Total**              | **35** |           |
 
 ---
 
 ## Uso
 
+### Pré-requisitos
+
+- Node.js 22+
+- Docker e Docker Compose
+
+### Banco de Dados
+
+```bash
+docker compose up -d   # Sobe o PostgreSQL na porta 5434
+```
+
 ### Backend
 
 ```bash
 cd backend
-cp .env.example .env    # Configurar credenciais PostgreSQL
+cp .env.example .env   # Credenciais já configuradas para dev
 npm install
-npm run dev             # http://localhost:3000
+npm run dev            # http://localhost:3000
 ```
 
 ### Frontend
@@ -133,8 +172,10 @@ npm run dev             # http://localhost:3000
 ```bash
 cd frontend
 npm install
-npm run dev             # http://localhost:5173
+npm run dev            # http://localhost:5173
 ```
+
+### Fluxo
 
 1. Acesse `http://localhost:5173`
 2. Faça upload de um arquivo CSV
