@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: csv-processor-db
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: csv_processor
+      POSTGRES_USER: csv_user
+      POSTGRES_PASSWORD: csv_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/src/database/migrations:/docker-entrypoint-initdb.d:z
+    healthcheck:
+      test: ["CMD-SHELL", pg_isready -U csv_user -d csv_processor]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:

@@ -9,14 +9,14 @@ import { formatDataResponse } from "../utils/format.util";
 
 type DataResponse = ReturnType<typeof formatDataResponse>;
 
-export const download = asyncErrorHandler((req: Request, res: Response) => {
+export const download = asyncErrorHandler(async (req: Request, res: Response) => {
   const { processId } = req.params;
 
   if (!processId) {
     throw new ValidationError("Process ID is required");
   }
 
-  const status = getCsvProcessingStatus(processId);
+  const status = await getCsvProcessingStatus(processId);
 
   if (!status?.result) {
     throw new NotFoundError("Processed data not found");
