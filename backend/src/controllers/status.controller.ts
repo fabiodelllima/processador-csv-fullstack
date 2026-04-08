@@ -8,14 +8,14 @@ import { formatProcessingResponse } from "../utils/format.util";
 
 type ProcessingResponse = ReturnType<typeof formatProcessingResponse>;
 
-export const getStatus = asyncErrorHandler((req: Request, res: Response) => {
+export const getStatus = asyncErrorHandler(async (req: Request, res: Response) => {
   const { processId } = req.params;
 
   if (!processId) {
     throw new ValidationError("Process ID is required");
   }
 
-  const status = getCsvProcessingStatus(processId);
+  const status = await getCsvProcessingStatus(processId);
 
   if (!status) {
     throw new NotFoundError("Processing ID not found");
