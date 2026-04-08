@@ -11,12 +11,11 @@ const app: Express = express();
 
 app.use(
   cors({
-    origin: env.cors.origin === "*" ? "*" : env.cors.origin.split(","),
+    origin: env.cors.origin.split(",").map((o) => o.trim()),
   }),
 );
 
 app.use(express.json());
-
 app.use("/api/csv", csvRoutes);
 
 app.get("/health", (_req, res) => {

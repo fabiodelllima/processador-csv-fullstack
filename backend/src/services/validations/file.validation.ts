@@ -1,5 +1,7 @@
 import { createReadStream } from "node:fs";
+import path from "node:path";
 import { createInterface } from "node:readline";
+import { env } from "../../config/env.config";
 import { ValidationError } from "../../errors/ValidationError";
 
 const REQUIRED_COLUMNS = [
@@ -33,7 +35,10 @@ const REQUIRED_COLUMNS = [
 ] as const;
 
 export const validateFileHeaders = async (filePath: string): Promise<void> => {
-  const stream = createReadStream(filePath);
+  const safeName = path.basename(filePath);
+  const safePath = path.join(env.upload.folder, safeName);
+
+  const stream = createReadStream(safePath);
   const rl = createInterface({ input: stream, crlfDelay: Infinity });
 
   const firstLine = await new Promise<string>((resolve, reject) => {
@@ -46,7 +51,6 @@ export const validateFileHeaders = async (filePath: string): Promise<void> => {
   });
 
   const headers = firstLine.split(",").map((h) => h.trim().replace(/[\r\n"]/g, ""));
-
   const missingColumns = REQUIRED_COLUMNS.filter((column) => !headers.includes(column));
 
   if (missingColumns.length > 0) {
