@@ -10,14 +10,13 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     commit-message:
-      prefix: "chore(deps)"
-      prefix-development: "chore(deps-dev)"
+      prefix: "chore"
       include: "scope"
+    labels:
+      - "dependencies"
     groups:
       root-minor-patch:
-        update-types:
-          - "minor"
-          - "patch"
+        update-types: ["minor", "patch"]
 
   # Backend (Express + TypeScript) - npm
   - package-ecosystem: "npm"
@@ -26,14 +25,13 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     commit-message:
-      prefix: "chore(deps-backend)"
-      prefix-development: "chore(deps-dev-backend)"
+      prefix: "chore"
       include: "scope"
+    labels:
+      - "dependencies"
     groups:
       backend-minor-patch:
-        update-types:
-          - "minor"
-          - "patch"
+        update-types: ["minor", "patch"]
 
   # Frontend (React + Vite + TypeScript) - npm
   - package-ecosystem: "npm"
@@ -42,14 +40,13 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 10
     commit-message:
-      prefix: "chore(deps-frontend)"
-      prefix-development: "chore(deps-dev-frontend)"
+      prefix: "chore"
       include: "scope"
+    labels:
+      - "dependencies"
     groups:
       frontend-minor-patch:
-        update-types:
-          - "minor"
-          - "patch"
+        update-types: ["minor", "patch"]
 
   # GitHub Actions workflows
   - package-ecosystem: "github-actions"
@@ -57,5 +54,7 @@ updates:
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: "chore(ci)"
+      prefix: "chore"
       include: "scope"
+    labels:
+      - "dependencies"
