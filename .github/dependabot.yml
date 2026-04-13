@@ -3,7 +3,7 @@
 
 version: 2
 updates:
-  # Root (Biome shared tooling) - npm
+  # Root (Biome shared tooling)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -18,7 +18,7 @@ updates:
       root-minor-patch:
         update-types: ["minor", "patch"]
 
-  # Backend (Express + TypeScript) - npm
+  # Backend (Express + TypeScript)
   - package-ecosystem: "npm"
     directory: "/backend"
     schedule:
@@ -33,7 +33,7 @@ updates:
       backend-minor-patch:
         update-types: ["minor", "patch"]
 
-  # Frontend (React + Vite + TypeScript) - npm
+  # Frontend (React + Vite + TypeScript)
   - package-ecosystem: "npm"
     directory: "/frontend"
     schedule:
@@ -48,7 +48,7 @@ updates:
       frontend-minor-patch:
         update-types: ["minor", "patch"]
 
-  # GitHub Actions workflows
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
