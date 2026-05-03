@@ -19,6 +19,6 @@
   },
   "homepage": "https://github.com/fabiodelllima/processador-csv-fullstack#readme",
   "devDependencies": {
-    "@biomejs/biome": "^2.4.13"
+    "@biomejs/biome": "^2.4.14"
   }
 }
