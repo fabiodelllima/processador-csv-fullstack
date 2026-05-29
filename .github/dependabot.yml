@@ -1,11 +1,11 @@
 # Dependabot configuration
 # Docs: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
 version: 2
 updates:
   # Root (Biome shared tooling)
   - package-ecosystem: "npm"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
@@ -14,13 +14,18 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
+    cooldown:
+      default-days: 7
+      semver-patch-days: 7
+      semver-minor-days: 14
+      semver-major-days: 30
     groups:
       root-minor-patch:
         update-types: ["minor", "patch"]
-
   # Backend (Express + TypeScript)
   - package-ecosystem: "npm"
     directory: "/backend"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
@@ -29,13 +34,18 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
+    cooldown:
+      default-days: 7
+      semver-patch-days: 7
+      semver-minor-days: 14
+      semver-major-days: 30
     groups:
       backend-minor-patch:
         update-types: ["minor", "patch"]
-
   # Frontend (React + Vite + TypeScript)
   - package-ecosystem: "npm"
     directory: "/frontend"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
@@ -44,13 +54,18 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
+    cooldown:
+      default-days: 7
+      semver-patch-days: 7
+      semver-minor-days: 14
+      semver-major-days: 30
     groups:
       frontend-minor-patch:
         update-types: ["minor", "patch"]
-
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "develop"
     schedule:
       interval: "weekly"
     commit-message:
@@ -58,3 +73,8 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
+    cooldown:
+      default-days: 7
+      semver-patch-days: 7
+      semver-minor-days: 14
+      semver-major-days: 30
